@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "MONGODB_URI=mongodb://auto-service-log:qweqweqwe1@ds259528.mlab.com:59528/auto-service-log SECRET=dsfsdf nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -34,6 +34,7 @@
     "nodemon": "^2.0.2",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "react-dom": "^16.12.0"
   }
 }

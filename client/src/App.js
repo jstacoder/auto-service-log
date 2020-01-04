@@ -16,6 +16,8 @@ import SignUp from './components/authentication/SignUp';
 import SignOut from './components/authentication/SignOut';
 import SignIn from './components/authentication/SignIn';
 import { Services } from './pages/Services'
+import { ServiceContextProvider } from './contexts/ServiceContext'
+import { VehicleContextProvider } from './contexts/VehicleContext'
 
 library.add(faCogs);
 
@@ -23,18 +25,22 @@ class App extends Component {
   render() {
     return (
           <div>
-            <Header />
-            <Switch>
-              <Route exact path="/" component={Home} />
-              <Route path="/signup" render={()=> <SignUp />} />
-              <Route path="/signout" render={()=> <SignOut />} />
-              <Route path="/signin" render={()=> <SignIn />} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/vehicle-details" component={VehicleDetails} />
-              <Route path="/services" component={Services}/>
-              <Route component={Error} />
-            </Switch>
-            <Footer />
+            <VehicleContextProvider>
+              <ServiceContextProvider>
+                <Header />
+                <Switch>
+                  <Route exact path="/" component={Home} />
+                  <Route path="/signup" render={()=> <SignUp />} />
+                  <Route path="/signout" render={()=> <SignOut />} />
+                  <Route path="/signin" render={()=> <SignIn />} />
+                  <Route path="/dashboard" component={Dashboard} />
+                  <Route path="/vehicle-details" component={VehicleDetails} />
+                  <Route path="/services" component={Services}/>
+                  <Route component={Error} />
+                </Switch>
+                <Footer />
+              </ServiceContextProvider>
+            </VehicleContextProvider>
           </div>
     );
   }

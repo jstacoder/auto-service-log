@@ -112,6 +112,22 @@ const createVehicle = (obj, {input: {make, model, year}}, context, info) => {
   const vehicle = new Vehicle({make: make.name, model: model.name, year})
   return vehicle.save().then(vehicle => ({ ok: true, vehicle: { make, model, year} }))
 }
+const createService = (obj, {input}, context, info)=> {
+  const service = new Service({
+    ...input,
+    estimatedTimeToComplete: JSON.stringify(input.estimatedTimeToComplete),
+    suggestedServiceInterval: JSON.stringify(input.suggestedServiceInterval),
+  })
+  return new Promise((resolve, reject) => {
+    service.save((err, result) => {
+      console.log(err)
+      if (err) {
+        reject(err)
+      }
+      resolve({ ok: true, service: result })
+    })
+  })
+}
 const resolvers = {
   Query:{
     getMake,
@@ -123,6 +139,7 @@ const resolvers = {
   },
   Mutation: {
     createVehicle,
+    createService,
   },
   Make: {
     models(obj, args, context, info) {

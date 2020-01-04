@@ -1,64 +1,51 @@
 import "bootstrap/scss/bootstrap.scss";
-import React, { Component } from "react";
+import React, { Component, useState, useEffect } from "react";
 import { Container, Row } from "reactstrap";
 import requireAuth from "../components/requireAuth";
 import AddVehicle from "../components/dashboard/AddVehicle";
 import VehihcleCard from "../components/dashboard/VehicleCard";
-import { GraphQLClient } from 'graphql-request'
+import { makeRequest } from '../helpers/graphql'
+import { useVehicleContext } from '../contexts/VehicleContext'
 
+const Dashboard = () => {
+   const [id, setId] = useState("")
+   const [make, setMake] = useState(null)
+   const [model, setModel] = useState(null)
+   const [year, setYear] = useState('')
+   const [loadingModels, setLoadingModels] = useState(false)
+   const [loadingMakes, setLoadingMakes] = useState(false)
+   const [makes, setMakes] = useState([])
+   const [models, setModels] = useState([])
 
-const makeRequest = (query, variables) =>{
-  const url = 'http://localhost:5000/graphql'
-  const client = new GraphQLClient(url,{method: 'POST'})
+  useEffect(()=>{
+    makeRequest(
+        `query models($input: GetModelsInput!){ getModels(input: $input) { name } }`,
+        { input: { make: { name: make}, year}}
+    ).then(({getModels})=>{
+        setModels(getModels)
+        setLoadingModels(false)
+    })
+  }, [make])
 
-  return client.request(query, variables)
-}
+   const { vehicles, addVehicle } = useVehicleContext()
 
-class Dashboard extends Component {
-  state = {
-    vehicleDatabase: [],
-    id: "",
-    make: null,
-    model: null,
-    year: null,
-    loadingModels: false,
-    loadingMakes: false,
-    makes: [],
-    models: [],
-  };
-
-  componentWillMount = () => {
-    this.readData();
-  };
-
-  handleChange = ({ target: { name, value } }) => {
+   const handleChange = ({ target: { name, value } }) => {
     //workaround mutating state directly...
-
-    this.setState({ [name]: value });
-  };
+    const changeFuncs = {
+      make: setMake,
+      model: setModel,
+      year: setYear,
+    }
+    const changeFunc = changeFuncs[name]
+     changeFunc(value)
+  }
 
   //CREATE data from the form submission
-  handleSubmit = async event => {
-    event.preventDefault();
-    //destructure
-    const { make, model, year } = this.state;
+  const handleSubmit = async event => {
+    event.preventDefault()
     //conditional input validation
     if (!make || !model || !year) return null;
-    const query = `
-    mutation newVehicle($input: CreateVehicleInput!){
-      createVehicle(input:$input){
-        ok
-        vehicle{
-          make{
-            name
-          }
-          model {
-             name
-          }
-        }
-      }
-    }
-    `
+
     const variables = {
       input: {
         make:{
@@ -70,63 +57,29 @@ class Dashboard extends Component {
         year,
       }
     }
-    const res = await makeRequest(query, variables)
+    addVehicle(variables)
     // setState + reset form values onSubmit
-    this.setState(prevState => ({
-      //destructure previous values, submit, then reset
-      vehicleDatabase: [...prevState.vehicleDatabase, { make, model, year }],
-      make: null,
-      model: null,
-      year: ""
-    }));
-  };
-
-  //READ data from DB and then setState
-  readData = async dispatch => {
-    const query = `
-      query vehicles {
-        getVehicles{
-          make{
-            name
-          }
-          model {
-            name
-          }
-          year
-          _id
-        }
-      }
-    `
-    const result = await makeRequest(query)
-    this.setState({vehicleDatabase: result.getVehicles})
-    // axios.get("/getVehicles")
-    //   .then(response => {
-    //     this.setState({
-    //       vehicleDatabase: response.data.vehicles
-    //     });
-    //     console.log('VDB', response.data.vehicles)
-    //   })
-    //   .catch(error => {
-    //     console.log("Error fetching and parsing data", error);
-    //   });
-  };
+    setMake(null)
+    setModel(null)
+    setYear("")
+  }
 
   //UPDATE data from DB
-  updateData = editedVehicle => {
+  const updateData = editedVehicle => {
     //Axios update will go here...
     //assing a copy of vehicle array with modified value for the editedVehicle.
     const vehicleDatabase = this.state.vehicleDatabase.map(vehicle => {
       return vehicle._id === editedVehicle._id ? editedVehicle : vehicle;
-    });
+    })
     //set new state
     this.setState({
       vehicleDatabase
-    });
-  };
+    })
+  }
 
   // DELETE function wont delete new vehicleDatabase because they are not created with an ID,
   // once you hoock up database you'll use the DB's id instead of 1, 2, 3.
-  deleteData = vehicleId => {
+  const deleteData = vehicleId => {
     //Axios delete will go here...
     //assing a new vehicleDatabase const removing the to delete filtering by id
     const vehicleDatabase = this.state.vehicleDatabase.filter(
@@ -137,59 +90,65 @@ class Dashboard extends Component {
     });
   };
 
-  handleYearChange = e =>{
-    this.setState({year: e.target.value, loadingMakes: true},()=> {
-      if(this.state.year.toString().length === 4) {
+  const handleYearChange = e =>{
+    setYear(e.target.value)
+    if(e.target.value.toString().length === 4) {
+        setLoadingMakes(true)
         makeRequest(`{getMakes{ name }}`).then(({ getMakes }) => {
-          this.setState({ makes: getMakes,  loadingMakes: false })
+          setMakes(getMakes)
+          setLoadingMakes(false)
         })
-      }
-    })
+    }
   }
-  handleMakeChange = e =>{
-    this.setState({make: e.target.value, loadingModels: true}, ()=>{
-       makeRequest(`query models($input: GetModelsInput!){ getModels(input: $input) { name } }`, { input: { make: { name: this.state.make}, year: this.state.year}}).then(({getModels})=>{
-         this.setState({models: getModels, loadingModels: false})
-      })
-    })
+  const handleMakeChange = e =>{
+    setLoadingModels(true)
+    setMake(e.target.value)
+
   }
 
-  handleModelChange = e =>{
-    this.setState({model: e.target.value})
+  const handleModelChange = e =>{
+    setModel(e.target.value)
   }
 
-  render() {
     return (
       <Container>
         <h1>Vehicle Dashboard</h1>
         <p>Browse or add a vehicle</p>
         <AddVehicle
-          {...this.state}
-          onHandleChange={this.handleChange}
-          onHandleSubmit={this.handleSubmit}
-          onHandleYearChange={this.handleYearChange}
-          onHandleModelChange={this.handleModelChange}
-          onHandleMakeChange={this.handleMakeChange}
-          makes={this.state.makes}
-          models={this.state.models}
-          loadingMakes={this.state.loadingMakes}
-          loadingModels={this.state.loadingModels}
+          onHandleChange={handleChange}
+          onHandleSubmit={handleSubmit}
+          onHandleYearChange={handleYearChange}
+          onHandleModelChange={handleModelChange}
+          onHandleMakeChange={handleMakeChange}
+          makes={makes}
+          models={models}
+          loadingMakes={loadingMakes}
+          loadingModels={loadingModels}
+          make={make}
+          model={model}
+          year={year}
         />
-        <Row>
-          {this.state.vehicleDatabase.map((vehicle, key) => (
+        <VehicleList updateData={updateData} deleteData={deleteData}/>
+      </Container>
+    );
+  }
+
+const VehicleList = ({updateData, deleteData}) => {
+  const { vehicles } = useVehicleContext()
+  return (
+       <Row>
+          {vehicles.map((vehicle, key) => (
             <VehihcleCard
               {...vehicle}
               make={vehicle.make.name}
               model={vehicle.model.name}
               key={key}
-              updateData={this.updateData}
-              deleteData={this.deleteData}
+              updateData={updateData}
+              deleteData={deleteData}
             />
           ))}
         </Row>
-      </Container>
-    );
-  }
+  )
 }
 
 export default requireAuth(Dashboard);

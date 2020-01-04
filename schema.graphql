@@ -201,9 +201,18 @@ type VehicleResult implements IResult {
   vehicle: Vehicle!
 }
 
+type ServiceOut {
+  name: String
+  estimatedTimeToComplete: String
+  difficulty: Difficulty
+  suggestedServiceInterval: String
+  notes: String
+}
+
 type ServiceResult implements IResult {
   ok: Boolean
-  service: Service!
+  service: ServiceOut
+  error: String
 }
 
 type JobResult implements IResult {
@@ -250,9 +259,9 @@ input IntervalInput {
 
 input ServiceInput{
   name: String!
-  estimatedTimeToComplete: [String]
+  estimatedTimeToComplete: [IntervalInput]
   difficulty: Difficulty
-  suggestedServiceInterval: IntervalInput
+  suggestedServiceInterval: [IntervalInput]
   notes: String
 }
 
