@@ -53,6 +53,7 @@ class VehicleCard extends React.Component {
     });
   };
 
+
   // this renderContent function written outside render method to use if statement
   renderContent = () => {
     //deconstruct props
@@ -68,6 +69,8 @@ class VehicleCard extends React.Component {
                 {model} | {year}
               </CardSubtitle>
               <div className="text-right">
+
+                  <Button onClick={this.addJob} color='success' className='mr-2'>add job</Button>
                   <Button
                     className="mt-2 mb-2 mr-2"
                     color="primary"
@@ -75,6 +78,7 @@ class VehicleCard extends React.Component {
                   >
                     Details
                   </Button>
+
                 <SettingsGroup
                   handleEditClick={this.handleEditClick}
                   handleDeleteClick={this.handleDeleteClick}

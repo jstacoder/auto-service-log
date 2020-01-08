@@ -47,7 +47,6 @@ const Dashboard = () => {
     if (!make || !model || !year) return null;
 
     const variables = {
-      input: {
         make:{
           name: make
         },
@@ -55,7 +54,6 @@ const Dashboard = () => {
           name: model
         },
         year,
-      }
     }
     addVehicle(variables)
     // setState + reset form values onSubmit

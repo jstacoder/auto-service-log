@@ -20,8 +20,8 @@ const queries = {
   `,
   // language=GraphQL
   createVehicle: `
-    mutation newVehicle($input: CreateVehicleInput!){
-      createVehicle(input:$input){
+    mutation newVehicle($vehicle: CreateVehicleInput!){
+      createVehicle(input:$vehicle){
         ok
         vehicle{
           make{
@@ -56,7 +56,7 @@ export const VehicleContextProvider = ({children}) => {
 
 
   const addVehicle = async vehicle => {
-    await makeRequest(queries.createService, {vehicle})
+    await makeRequest(queries.createVehicle, {vehicle})
     setVehicles(vehicles => [...vehicles, {...vehicle}])
   }
   const removeVehicle = vehicle => {

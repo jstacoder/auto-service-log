@@ -18,6 +18,7 @@ import SignIn from './components/authentication/SignIn';
 import { Services } from './pages/Services'
 import { ServiceContextProvider } from './contexts/ServiceContext'
 import { VehicleContextProvider } from './contexts/VehicleContext'
+import { ToggleContextProvider } from './components/Toggle'
 
 library.add(faCogs);
 
@@ -25,6 +26,7 @@ class App extends Component {
   render() {
     return (
           <div>
+            <ToggleContextProvider>
             <VehicleContextProvider>
               <ServiceContextProvider>
                 <Header />
@@ -41,6 +43,7 @@ class App extends Component {
                 <Footer />
               </ServiceContextProvider>
             </VehicleContextProvider>
+            </ToggleContextProvider>
           </div>
     );
   }
