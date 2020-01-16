@@ -1,13 +1,20 @@
 import "bootstrap/scss/bootstrap.scss";
 import React, { Component, useState, useEffect } from "react";
-import { Container, Row } from "reactstrap";
+import {
+  Button,
+  Container,
+  Row
+} from 'reactstrap'
 import requireAuth from "../components/requireAuth";
 import AddVehicle from "../components/dashboard/AddVehicle";
 import VehihcleCard from "../components/dashboard/VehicleCard";
+import { useToggleContext } from '../components/Toggle'
 import { makeRequest } from '../helpers/graphql'
 import { useVehicleContext } from '../contexts/VehicleContext'
+import { AddJob } from '../components/jobs/AddJob'
 
 const Dashboard = () => {
+  const { on, off, toggle } = useToggleContext()
    const [id, setId] = useState("")
    const [make, setMake] = useState(null)
    const [model, setModel] = useState(null)
@@ -16,6 +23,7 @@ const Dashboard = () => {
    const [loadingMakes, setLoadingMakes] = useState(false)
    const [makes, setMakes] = useState([])
    const [models, setModels] = useState([])
+   const [activeVehicle, setActiveVehicle] = useState(null)
 
   useEffect(()=>{
     makeRequest(
@@ -27,7 +35,7 @@ const Dashboard = () => {
     })
   }, [make])
 
-   const { vehicles, addVehicle } = useVehicleContext()
+   const { addVehicle } = useVehicleContext()
 
    const handleChange = ({ target: { name, value } }) => {
     //workaround mutating state directly...
@@ -108,11 +116,17 @@ const Dashboard = () => {
     setModel(e.target.value)
   }
 
+  const openAddJobForm = vehicle =>{
+    setActiveVehicle(vehicle)
+    toggle()
+  }
     return (
       <Container>
-        <h1>Vehicle Dashboard</h1>
-        <p>Browse or add a vehicle</p>
-        <AddVehicle
+        {off ? (
+            <>
+            <h1>Vehicle Dashboard</h1>
+            <p> Browse or add a vehicle</p>
+          <AddVehicle
           onHandleChange={handleChange}
           onHandleSubmit={handleSubmit}
           onHandleYearChange={handleYearChange}
@@ -125,21 +139,32 @@ const Dashboard = () => {
           make={make}
           model={model}
           year={year}
-        />
-        <VehicleList updateData={updateData} deleteData={deleteData}/>
+          />
+          <VehicleList openAddJobForm={openAddJobForm} updateData={updateData} deleteData={deleteData}/>
+          </>
+          ) : activeVehicle ? (
+              <AddJob activeVehicle={activeVehicle} toggle={toggle}/>
+        ) : null
+        }
       </Container>
     );
   }
 
-const VehicleList = ({updateData, deleteData}) => {
+const VehicleList = ({updateData, deleteData, openAddJobForm}) => {
   const { vehicles } = useVehicleContext()
+  const { on, off, toggle } = useToggleContext()
+
+
   return (
        <Row>
           {vehicles.map((vehicle, key) => (
             <VehihcleCard
               {...vehicle}
+              currentOdometerReading={vehicle.currentOdometerReading}
+              openAddJobForm={openAddJobForm}
+              toggle={toggle}
               make={vehicle.make.name}
-              model={vehicle.model.name}
+              model={vehicle.model}
               key={key}
               updateData={updateData}
               deleteData={deleteData}

@@ -1,13 +1,31 @@
 import React, { useState } from "react";
-import { Button, Form, FormGroup, Input, Label, FormText } from "reactstrap";
+import { Button, Form, FormGroup, Input, Label, FormText, Col,  Row } from "reactstrap";
 import Toggle from "../Toggle";
+import { useToggleContext } from '../Toggle'
 
 export const AddService = ({onHandleSubmit}) => {
   const [serviceName, setServiceName] = useState('')
   const [difficulty, setDifficulty] = useState('EASY')
-  const [estimatedTimeToComplete, setEstimatedTimeToComplete] = useState('')
-  const [suggestedServiceInterval, setSuggestedServiceInterval] = useState('')
+  const [estimatedTimeToCompleteMinutes, setEstimatedTimeToCompleteMinutes] = useState('')
+  const [estimatedTimeToCompleteHours, setEstimatedTimeToCompleteHours] = useState('')
+  const [estimatedTimeToCompleteDays, setEstimatedTimeToCompleteDays] = useState('')
+  const [suggestedServiceIntervalMonths, setSuggestedServiceIntervalMonths] = useState('')
+  const [suggestedServiceIntervalYears, setSuggestedServiceIntervalYears] = useState('')
+  const [suggestedServiceIntervalMiles, setSuggestedServiceIntervalMiles] = useState('')
   const [serviceNote, setServiceNote] = useState('')
+  const { on, off, toggle } = useToggleContext()
+
+  const setSuggestedServiceInterval = val => {
+    setSuggestedServiceIntervalMiles(val)
+    setSuggestedServiceIntervalMonths(val)
+    setSuggestedServiceIntervalYears(val)
+  }
+
+  const setEstimatedTimeToComplete = val => {
+    setEstimatedTimeToCompleteDays(val)
+    setEstimatedTimeToCompleteHours(val)
+    setEstimatedTimeToCompleteMinutes(val)
+  }
 
   const resetForm = () => {
     setServiceName('')
@@ -30,8 +48,12 @@ export const AddService = ({onHandleSubmit}) => {
   const setMap = {
     name: setServiceName,
     difficulty: setDifficulty,
-    estimatedTimeToComplete: setEstimatedTimeToComplete,
-    suggestedServiceInterval: setSuggestedServiceInterval,
+    estimatedTimeToCompleteMinutes: setEstimatedTimeToCompleteMinutes,
+    estimatedTimeToCompleteHours: setEstimatedTimeToCompleteHours,
+    estimatedTimeToCompleteDays: setEstimatedTimeToCompleteDays,
+    suggestedServiceIntervalMiles: setSuggestedServiceIntervalMiles,
+    suggestedServiceIntervalYears: setSuggestedServiceIntervalYears,
+    suggestedServiceIntervalMonths: setSuggestedServiceIntervalMonths,
     notes: setServiceNote,
   }
 
@@ -46,8 +68,16 @@ export const AddService = ({onHandleSubmit}) => {
         {
           name: serviceName,
           difficulty,
-          estimatedTimeToComplete: parseInterval(estimatedTimeToComplete),
-          suggestedServiceInterval: parseInterval(suggestedServiceInterval),
+          estimatedTimeToComplete: {
+            minutes: estimatedTimeToCompleteMinutes && parseInt(estimatedTimeToCompleteMinutes),
+            hours: estimatedTimeToCompleteHours && parseInt(estimatedTimeToCompleteHours),
+            days: estimatedTimeToCompleteDays && parseInt(estimatedTimeToCompleteDays),
+          },
+          suggestedServiceInterval: {
+            months: suggestedServiceIntervalMonths && parseInt(suggestedServiceIntervalMonths),
+            years: suggestedServiceIntervalYears && parseInt(suggestedServiceIntervalYears),
+            miles: suggestedServiceIntervalMiles && parseInt(suggestedServiceIntervalMiles),
+          },
           notes: serviceNote,
         }
     )
@@ -57,14 +87,13 @@ export const AddService = ({onHandleSubmit}) => {
 
   return (
 
-    <Toggle>
-      {({ on, off, toggle }) => (
           <div>
           {on && (
               <Form>
                 <FormText>
                   <h3>Add a Service</h3>
                 </FormText>
+                  <legend>
                   <FormGroup row>
                   <Label for='name'>Name</Label>
                 <Input
@@ -78,7 +107,8 @@ export const AddService = ({onHandleSubmit}) => {
               </FormGroup>
               <FormGroup row>
                 <Label for='difficulty'>Difficulty</Label>
-                <select
+                <Input
+                    type='select'
                     name="difficulty"
                     id='difficulty'
                     placeholder="Difficulty Level"
@@ -90,20 +120,72 @@ export const AddService = ({onHandleSubmit}) => {
                   <option value={'INTERMEDIATE'}>Intermediate</option>
                   <option value={'HARD'}>Hard</option>
                   <option value={'IMPOSSIBLE'}>Impossible</option>
-                </select>
+                </Input>
               </FormGroup>
-              <FormGroup row>
-                <Label for='estimatedTimeToComplete'>Estimated Time To Complete</Label>
-                <Input name={'estimatedTimeToComplete'} id='estimatedTimeToComplete' onChange={onChange} value={estimatedTimeToComplete} />
-              </FormGroup>
-              <FormGroup row>
-                <Label for='suggestedServiceInterval'>Suggested Service Interval</Label>
-                <Input name={'suggestedServiceInterval'} id={'suggestedServiceInterval'} onChange={onChange} value={suggestedServiceInterval} />
-              </FormGroup>
+                <Row form>
+                  <Col md={{size: 5}}>
+                    <FormGroup style={{display: 'flex', flexDirection: 'column'}}>
+                        <FormText inline style={{display: 'block'}}>Estimated Time To Complete</FormText>
+                        <FormGroup row>
+                          <Label for='estimatedTimeToCompleteMinutes'>Minutes</Label>
+                          <Input
+                              size='sm'
+                              name={'estimatedTimeToCompleteMinutes'}
+                              id='estimatedTimeToCompleteMinutes'
+                              onChange={onChange}
+                              value={estimatedTimeToCompleteMinutes} />
+                          <Label for='estimatedTimeToCompleteMinutes'>Hours</Label>
+                          <Input
+                              size='sm'
+                              name={'estimatedTimeToCompleteHours'}
+                              id='estimatedTimeToCompleteHours'
+                              onChange={onChange}
+                              value={estimatedTimeToCompleteHours} />
+                          <Label for='estimatedTimeToCompleteMinutes'>Days</Label>
+                          <Input
+                              size='sm'
+                              name={'estimatedTimeToCompleteDays'}
+                              id='estimatedTimeToCompleteDays'
+                              onChange={onChange}
+                              value={estimatedTimeToCompleteDays} />
+
+                        </FormGroup>
+                    </FormGroup>
+                  </Col>
+                  <Col md={{size: 5, offset: 2}}>
+                        <FormGroup style={{display: 'flex',flexDirection: 'column'}}>
+                          <FormText inline>Suggested  Service Interval</FormText>
+                          <FormGroup row>
+                          <Label for={'suggestedServiceIntervalMiles'}>Miles</Label>
+                          <Input
+                              size='sm'
+                              name={'suggestedServiceIntervalMiles'}
+                              id={'suggestedServiceIntervalMiles'}
+                              onChange={onChange}
+                              value={suggestedServiceIntervalMiles} />
+                          <Label for={'suggestedServiceIntervalMonths'}>Months</Label>
+                          <Input
+                              size='sm'
+                              name={'suggestedServiceIntervalMonths'}
+                              id={'suggestedServiceIntervalMonths'}
+                              onChange={onChange}
+                              value={suggestedServiceIntervalMonths} />
+                          <Label for={'suggestedServiceIntervalYears'}>Years</Label>
+                          <Input
+                              size='sm'
+                              name={'suggestedServiceIntervalYears'}
+                              id={'suggestedServiceIntervalYears'}
+                              onChange={onChange}
+                              value={suggestedServiceIntervalYears} />
+                          </FormGroup>
+                        </FormGroup>
+                  </Col>
+                </Row>
               <FormGroup row>
                 <Label htmlFor={'notes'}>Note</Label>
                 <Input type='textarea' value={serviceNote} onChange={onChange} id={'notes'} name={'notes'}/>
               </FormGroup>
+                  </legend>
               <div className="text-right">
                 <Button
                     className="text-right mr-2 mb-2"
@@ -128,8 +210,6 @@ export const AddService = ({onHandleSubmit}) => {
             </Button>
             )}
         </div>
-      )}
-    </Toggle>
 
   )
 }

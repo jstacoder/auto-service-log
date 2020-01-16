@@ -4,7 +4,10 @@ const { ServiceSchema } = require('./Service')
 const { VehicleSchema } = require('./Vehicle')
 
 const JobSchema = new Schema({
-  servicesPerformed: [ServiceSchema],
+  servicesPerformed: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'Service',
+  }],
   dateCompleted: {
      type: Date,
      default: Date.now(),

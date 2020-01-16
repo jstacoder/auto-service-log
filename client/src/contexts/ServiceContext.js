@@ -8,8 +8,16 @@ const queries = {
       services: getServices{
         name
         difficulty
-        estimatedTimeToComplete
-        suggestedServiceInterval
+        estimatedTimeToComplete {
+          minutes
+          hours
+          days
+        }
+        suggestedServiceInterval {
+          months
+          years
+          miles
+        }
         notes 
       }
     }
@@ -21,8 +29,16 @@ const queries = {
         service{
           name
           difficulty
-          estimatedTimeToComplete
-          suggestedServiceInterval
+          estimatedTimeToComplete {
+            minutes
+            hours
+            days     
+          }
+          suggestedServiceInterval{
+            months
+            years
+            miles
+          }
           name
          }
       } 

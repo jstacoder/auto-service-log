@@ -12,8 +12,9 @@ const queries = {
           }
           model {
             name
+            year
           }
-          year
+          currentOdometerReading
           _id
         }
       }
@@ -38,12 +39,17 @@ const queries = {
 
 export const VehicleContext = createContext({
   vehicles: [],
+  getActiveVehicle: ()=>{},
+  setActiveVehicle: vehicle=>{},
   addVehicle: vehicle => {},
   removeVehicle: vehicle => {},
 })
 
 export const VehicleContextProvider = ({children}) => {
   const [vehicleList, setVehicles] = useState( [])
+  const [activeVehicle, setActiveVehicle] = useState(null)
+
+  const getActiveVehicle = () => activeVehicle
 
   useEffect(()=>{
     const loadVehicles = async ()=> {
@@ -65,6 +71,8 @@ export const VehicleContextProvider = ({children}) => {
 
   const value = {
     vehicles: vehicleList,
+    getActiveVehicle,
+    setActiveVehicle,
     addVehicle,
     removeVehicle,
   }

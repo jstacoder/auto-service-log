@@ -26,6 +26,45 @@ scalar Minute
   a number of seconds ie: 15 = fifteen seconds
 """
 scalar Second
+
+scalar DateTime
+
+interface ShortInterval {
+  minutes: Minute
+  hours: Hour
+  days: Day
+}
+
+interface LongInterval {
+  months: Month
+  years: Year
+  miles: Int
+}
+
+type EstimatedTimeToCompleteType implements ShortInterval {
+  minutes: Minute
+  hours: Hour
+  days: Day
+}
+
+type ServiceIntervalType implements LongInterval {
+  months: Month
+  years: Year
+  miles: Int
+}
+
+input EstimatedTimeToCompleteInput {
+  minutes: Minute
+  hours: Hour
+  days: Day
+}
+
+input ServiceIntervalInput {
+  months: Month
+  years: Year
+  miles: Int
+}
+
 """
   a generic service
 """
@@ -37,7 +76,7 @@ interface IService {
   """
     how long it should take
   """
-  estimatedTimeToComplete: [String]
+  estimatedTimeToComplete: EstimatedTimeToCompleteType
   """
     how hard is it
   """
@@ -45,7 +84,7 @@ interface IService {
   """
     when should we be reminded to do it again
   """
-  suggestedServiceInterval: [String]
+  suggestedServiceInterval: ServiceIntervalType
   """
     materials etc...
   """
@@ -60,6 +99,27 @@ interface IResult{
     did the request succeed
   """
   ok: Boolean
+}
+
+
+
+"""
+  a recording of a given vehicles odometer at a given date/time
+"""
+type OdometerType {
+  miles: String!
+  dateCompleted: DateTime!
+}
+"""
+  a history of od readings for a vehicle
+"""
+type VehicleOdometerHistory {
+  vehicle: Vehicle!
+  readings: [OdometerType!]!
+}
+
+input OdometerInput {
+  miles: String!
 }
 
 """
@@ -107,9 +167,10 @@ type Vehicle {
   """
   trim: String
   """
-    the model year
+    latest odometer reading
   """
-  year: Year!
+  currentOdometerReading: Int
+
   _id: ID!
 }
 
@@ -118,50 +179,13 @@ type Garage {
 }
 
 """
-  a number of minutes ie: 4 = four minutes
-"""
-type MinuteType {
-  minutes: Minute!
-}
-"""
-  a number of seconds ie: 15 = fifteen seconds
-"""
-type SecondType {
-  seconds: Second!
-}
-"""
-  a number of hours ie: 3 = three hours
-"""
-type HourType {
-  hours: Hour!
-}
-"""
-  a number of days ie: 6 = six days
-"""
-type DayType {
-  days: Day!
-}
-"""
-  a number of months ie: 4 = four months
-"""
-type MonthType{
-  months: Month!
-}
-"""
-  a number of years ie: 4 = four years
-"""
-type YearType {
-  years: Year!
-}
-
-"""
   a specific service that may be done
 """
 type Service implements IService {
   name: String!
-  estimatedTimeToComplete: [String]
+  estimatedTimeToComplete: EstimatedTimeToCompleteType
   difficulty: Difficulty
-  suggestedServiceInterval: [String]
+  suggestedServiceInterval: ServiceIntervalType
   notes: String
 }
 
@@ -184,7 +208,7 @@ type Job {
   """
     how long did it take
   """
-  timeTaken: [Interval]
+  timeTaken: EstimatedTimeToCompleteType
   """
     how much did it cost
   """
@@ -193,7 +217,7 @@ type Job {
     the vehicle the service was performed on
   """
   vehicle: Vehicle
-  id: ID!
+  _id: ID!
 }
 
 type VehicleResult implements IResult {
@@ -201,11 +225,16 @@ type VehicleResult implements IResult {
   vehicle: Vehicle!
 }
 
+type OdometerResult {
+  ok: Boolean
+  errors: [String]
+}
+
 type ServiceOut {
   name: String
-  estimatedTimeToComplete: String
+  estimatedTimeToComplete: EstimatedTimeToCompleteType
   difficulty: Difficulty
-  suggestedServiceInterval: String
+  suggestedServiceInterval: ServiceIntervalType
   notes: String
 }
 
@@ -220,59 +249,25 @@ type JobResult implements IResult {
   job: Job!
 }
 
+
 input FindServiceInput {
   name: String
 }
 
-input MinuteInput {
-  minutes: Minute
-}
-
-input SecondInput {
-  seconds: Int!
-}
-
-input HourInput {
-  hours: Int!
-}
-
-input DayInput{
-  days: Int!
-}
-
-input MonthInput {
-  months: Int!
-}
-
-input YearInput {
-  years: Int!
-}
-
-input IntervalInput {
-  seconds: Second
-  minutes: Minute
-  hours: Hour
-  days: Day
-  months: Month
-  years: Year
-}
-
 input ServiceInput{
   name: String!
-  estimatedTimeToComplete: [IntervalInput]
+  estimatedTimeToComplete: EstimatedTimeToCompleteInput
   difficulty: Difficulty
-  suggestedServiceInterval: [IntervalInput]
+  suggestedServiceInterval: ServiceIntervalInput
   notes: String
 }
 
 input JobInput {
-  date: Date!
   performedBy: String!
   servicesPerformed: [FindServiceInput!]
-  timeTaken: IntervalInput
+  timeTaken: String
   cost: String
-  vehicle: ID!
-  id: ID!
+  vehicle: VehicleInput!
 }
 
 input ModelInput {
@@ -291,18 +286,18 @@ input GetModelsInput {
 input CreateVehicleInput {
   make: MakeInput!
   model: ModelInput!
-  year: Year!
+  miles: String
 }
 
+input VehicleInput {
+  _id: ID!
+}
 
+input OdometerReadingInput {
+  vehicle: VehicleInput!
+  miles: String!
+}
 
-union Interval =
-  MinuteType |
-  SecondType |
-  HourType |
-  DayType |
-  MonthType |
-  YearType
 
 enum Difficulty {
   """
@@ -368,6 +363,7 @@ type Query {
     get a specific job from the db
   """
   getJob(id: ID!): Job!
+
 }
 
 type Mutation {
@@ -386,6 +382,11 @@ type Mutation {
   """
   createJob(input: JobInput!): JobResult!
   # removeJob(job: ID!): RemovedResult!
+
+  """
+    add an entry to a vehicles odometer history
+  """
+  createOdometerReading(input: OdometerReadingInput!): OdometerResult!
 }
 
 schema {

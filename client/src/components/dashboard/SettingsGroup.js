@@ -1,65 +1,60 @@
-import React from 'react';
-import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import React, {useState} from 'react'
+import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Button, Modal, ModalHeader, ModalBody } from 'reactstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-export default class SettingsGroup extends React.Component {
-  constructor(props) {
-    super(props);
+export const SettingsGroup = ({handleEditClick, handleDeleteClick, vehicle}) => {
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [modal, setModal] = useState(false)
+  const [displayLog, setDisplayLog] = useState(false)
 
-    this.toggle = this.toggle.bind(this);
-    this.state = {
-      dropdownOpen: false,
-	  modal: false,
-    };
+  const showLog = () => setDisplayLog(true)
+  const hideLog = () => setDisplayLog(false)
+
+  const toggle = () => {
+    setDropdownOpen(dropdownOpen=> !dropdownOpen)
   }
 
-  toggle = () => {
-    this.setState({
-      dropdownOpen: !this.state.dropdownOpen,
-    });
+  const toggleModal = () => {
+    setModal(modal=> !modal)
   }
 
-  toggleModal = () => {
-	  this.setState({
-		modal: !this.state.modal,
-	  })
-  }
-
-  onEditClick = () => {
-    this.props.handleEditClick();
+  const onEditClick = () => {
+    props.handleEditClick()
   };
 
-  onDeleteClick = () => {
-    this.setState({
-      modal: !this.state.modal
-	});
-	
-	this.props.handleDeleteClick();
-  };
+  const onDeleteClick = () => {
+    toggleModal()
+	  props.handleDeleteClick()
+  }
 
-  render() {
-    return (
-      <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+  const onLogClick = ()=>{
+    
+  }
+
+  return (
+      <ButtonDropdown isOpen={dropdownOpen} toggle={toggle}>
         <DropdownToggle caret outline color="info">
           <FontAwesomeIcon icon="cogs" />
         </DropdownToggle>
         <DropdownMenu>
-          <DropdownItem className="text-danger" onClick={this.toggleModal}>Delete</DropdownItem>
+          <DropdownItem className="text-danger" onClick={toggleModal}>Delete</DropdownItem>
           <DropdownItem divider />
-          <DropdownItem onClick={this.onEditClick}>Edit</DropdownItem>
+          <DropdownItem onClick={onEditClick}>Edit</DropdownItem>
+          <DropdownItem onClick={onLogClick}>OD Log</DropdownItem>
         </DropdownMenu>
-        <Modal isOpen={this.state.modal} toggle={this.toggleModal} className={this.props.className}>
-			<ModalHeader toggle={this.toggleModal}>
+        <Modal isOpen={modal} toggle={toggleModal} className={props.className}>
+			<ModalHeader toggle={toggleModal}>
 				<span className="text-danger">WARNING: </span>
 			</ModalHeader>
           <ModalBody>
             <p className="text-center">Are you sure you want to delete this Vehicle?</p>
 			<div className="text-center">
-				<Button className="mt-2" color="danger" onClick={this.onDeleteClick}>Delete</Button>
+				<Button className="mt-2" color="danger" onClick={onDeleteClick}>Delete</Button>
 			</div>
           </ModalBody>
         </Modal>
       </ButtonDropdown>
     );
-  }
 }
+
+export default SettingsGroup

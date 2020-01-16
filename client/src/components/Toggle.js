@@ -23,6 +23,8 @@ export const ToggleContextProvider = ({children})=>{
   )
 }
 
+export const useToggleContext = () => useContext(ToggleContext)
+
 export const Toggle = ({children, ...props}) => {
   const { on, off, toggle } = useContext(ToggleContext)
 

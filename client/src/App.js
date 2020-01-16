@@ -29,6 +29,7 @@ class App extends Component {
             <ToggleContextProvider>
             <VehicleContextProvider>
               <ServiceContextProvider>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
                 <Header />
                 <Switch>
                   <Route exact path="/" component={Home} />
@@ -41,6 +42,7 @@ class App extends Component {
                   <Route component={Error} />
                 </Switch>
                 <Footer />
+                </div>
               </ServiceContextProvider>
             </VehicleContextProvider>
             </ToggleContextProvider>

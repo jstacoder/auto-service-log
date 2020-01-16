@@ -7,12 +7,13 @@ const VehicleSchema = new Schema({
     lowercase: true
   },
   model: {
-    type: String,
-    lowercase: true
+    name: String,
+    year: String
   },
   year: {
     type: Number,
   },
+  currentOdometerReading: Number,
 })
 
 exports = module.exports = mongoose.model('Vehicle', VehicleSchema )

@@ -19,12 +19,22 @@ const ServiceSchema = new Schema({
     unique: true,
     lowercase: true
   },
-  estimatedTimeToComplete: String,
+  estimatedTimeToComplete: {
+    minutes: Number,
+    hours: Number,
+    days: Number,
+    months: Number,
+    years: Number,
+  },
   difficulty:{
     type: String,
     enum: difficulty,
   },
-  suggestedServiceInterval: String,
+  suggestedServiceInterval: {
+    months: Number,
+    years: Number,
+    miles: Number,
+  },
   notes: String,
 })
 

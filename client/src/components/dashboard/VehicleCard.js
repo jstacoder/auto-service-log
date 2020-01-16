@@ -10,6 +10,10 @@ class VehicleCard extends React.Component {
     toggleEdit: false
   };
 
+  addJob = () =>{
+    this.props.openAddJobForm(this.props)
+  }
+
   handleEditClick = () => {
     //show edit form when clicking initial edit button
     this.setState({
@@ -43,13 +47,13 @@ class VehicleCard extends React.Component {
 
   handleDetailClick = () => {
     //deconstruct props
-    const { id, make, model, year } = this.props;
+    const { id, make, model } = this.props;
     //assign them to an object to be pushed
     //const propsToPush = { make, model, year };
     // use React-Router-Dom history.push to go to new page and send props
     this.props.history.push({
       pathname: "/vehicle-details",
-      state: { id, make, model, year }
+      state: { id, make, model: model.name, year: model.year }
     });
   };
 
@@ -57,20 +61,34 @@ class VehicleCard extends React.Component {
   // this renderContent function written outside render method to use if statement
   renderContent = () => {
     //deconstruct props
-    const { id, make, model, year } = this.props;
+    const { _id, make, model, currentOdometerReading } = this.props;
     //if toggleEdit is false show student card
     if (!this.state.toggleEdit) {
       return (
         <Fragment>
           <Col className="mt-2 mb-4" md="6">
-            <Card body id={id}>
+            <Card body id={_id}>
               <CardTitle className="lead">{make}</CardTitle>
               <CardSubtitle className="text-muted">
-                {model} | {year}
+                {model.name} | {model.year}
+              </CardSubtitle>
+              <CardSubtitle tag={'p'}>
+                {currentOdometerReading}: mi
               </CardSubtitle>
               <div className="text-right">
 
-                  <Button onClick={this.addJob} color='success' className='mr-2'>add job</Button>
+                  <Button
+                      onClick={this.addJob}
+                      color='success'
+                      className='mr-2'>
+                    Add Job
+                  </Button>
+                  <Button
+                    color='info'
+                    className='mr-2'
+                  >
+                    view jobs
+                  </Button>
                   <Button
                     className="mt-2 mb-2 mr-2"
                     color="primary"
@@ -80,6 +98,7 @@ class VehicleCard extends React.Component {
                   </Button>
 
                 <SettingsGroup
+                  vehicle={{make, model, _id}}
                   handleEditClick={this.handleEditClick}
                   handleDeleteClick={this.handleDeleteClick}
                 />
