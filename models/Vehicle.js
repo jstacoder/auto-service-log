@@ -3,16 +3,13 @@ const Schema = mongoose.Schema
 
 const VehicleSchema = new Schema({
   make: {
-    type: String,
-    lowercase: true
+    name: String,
   },
   model: {
     name: String,
     year: String
   },
-  year: {
-    type: Number,
-  },
+  year: Number,
   currentOdometerReading: Number,
 })
 

@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Button, Modal, ModalHeader, ModalBody } from 'reactstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-export const SettingsGroup = ({handleEditClick, handleDeleteClick, vehicle}) => {
+export const SettingsGroup = ({className, handleEditClick, handleDeleteClick, vehicle}) => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [modal, setModal] = useState(false)
   const [displayLog, setDisplayLog] = useState(false)
@@ -19,16 +19,16 @@ export const SettingsGroup = ({handleEditClick, handleDeleteClick, vehicle}) => 
   }
 
   const onEditClick = () => {
-    props.handleEditClick()
+    handleEditClick()
   };
 
   const onDeleteClick = () => {
     toggleModal()
-	  props.handleDeleteClick()
+	  handleDeleteClick()
   }
 
   const onLogClick = ()=>{
-    
+
   }
 
   return (
@@ -42,7 +42,7 @@ export const SettingsGroup = ({handleEditClick, handleDeleteClick, vehicle}) => 
           <DropdownItem onClick={onEditClick}>Edit</DropdownItem>
           <DropdownItem onClick={onLogClick}>OD Log</DropdownItem>
         </DropdownMenu>
-        <Modal isOpen={modal} toggle={toggleModal} className={props.className}>
+        <Modal isOpen={modal} toggle={toggleModal} className={className}>
 			<ModalHeader toggle={toggleModal}>
 				<span className="text-danger">WARNING: </span>
 			</ModalHeader>

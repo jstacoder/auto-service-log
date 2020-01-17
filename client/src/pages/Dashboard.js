@@ -26,13 +26,15 @@ const Dashboard = () => {
    const [activeVehicle, setActiveVehicle] = useState(null)
 
   useEffect(()=>{
-    makeRequest(
-        `query models($input: GetModelsInput!){ getModels(input: $input) { name } }`,
-        { input: { make: { name: make}, year}}
-    ).then(({getModels})=>{
+    if(make && make.name){
+      makeRequest(
+          `query models($input: GetModelsInput!){ getModels(input: $input) { name } }`,
+          { input: { make: { name: make}, year}}
+      ).then(({getModels})=>{
         setModels(getModels)
         setLoadingModels(false)
-    })
+      })
+    }
   }, [make])
 
    const { addVehicle } = useVehicleContext()
