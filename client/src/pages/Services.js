@@ -132,7 +132,6 @@ export const Services = () => {
                       <div>
                         <h2>Current Services</h2>
                   <p className="lead">Add your vehicle and log your maintenece.</p>
-                        <AddService />
                         <DataPage
                             goToPage={goToPage}
                             goBack={goBack}
@@ -176,6 +175,7 @@ export const Services = () => {
                   ) : null}
 
                         </DataPage>
+                        <AddService />
                       </div>
                   )}
                 </Col>

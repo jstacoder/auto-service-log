@@ -136,6 +136,22 @@ const getJob = (obj, args) => {
     })
   })
 }
+const getOdometerHistory = (obj, args) => {
+  return new Promise((resolve, reject)=>{
+    Vehicle.findById(args.vehicle, (err, vehicle)=>{
+      OdometerReading.find({vehicle: {_id: vehicle._id}}).sort('-dateCompleted').exec((err, readings)=> {
+        if (err) {
+          reject(err)
+        }
+        resolve({
+          vehicle,
+          readings,
+        })
+      })
+    })
+  })
+}
+
 const createVehicle = (obj, {input: {make, model, year}}, context, info) => {
   const vehicle = new Vehicle({make: make.name, model: model.name, year})
   return vehicle.save().then(vehicle => ({ ok: true, vehicle: { make, model, year} }))
@@ -193,6 +209,7 @@ const resolvers = {
     getServices,
     getJobs,
     getJob,
+    getOdometerHistory,
   },
   Mutation: {
     createVehicle,

@@ -1,10 +1,11 @@
 import "bootstrap/scss/bootstrap.scss";
-import React, { Component, useState, useEffect } from "react";
+import React, { Component, useState, useEffect, useMemo } from "react";
 import {
   Button,
   Container,
-  Row
+  Row,
 } from 'reactstrap'
+import { OdometerLog } from '../components/OdometerLog'
 import requireAuth from "../components/requireAuth";
 import AddVehicle from "../components/dashboard/AddVehicle";
 import VehihcleCard from "../components/dashboard/VehicleCard";
@@ -14,16 +15,24 @@ import { useVehicleContext } from '../contexts/VehicleContext'
 import { AddJob } from '../components/jobs/AddJob'
 
 const Dashboard = () => {
+  const [logModalOpen, setLogModalOpen] = useState(false)
   const { on, off, toggle } = useToggleContext()
-   const [id, setId] = useState("")
-   const [make, setMake] = useState(null)
-   const [model, setModel] = useState(null)
-   const [year, setYear] = useState('')
-   const [loadingModels, setLoadingModels] = useState(false)
-   const [loadingMakes, setLoadingMakes] = useState(false)
-   const [makes, setMakes] = useState([])
-   const [models, setModels] = useState([])
-   const [activeVehicle, setActiveVehicle] = useState(null)
+  const [make, setMake] = useState(null)
+  const [model, setModel] = useState(null)
+  const [year, setYear] = useState('')
+  const [loadingModels, setLoadingModels] = useState(false)
+  const [loadingMakes, setLoadingMakes] = useState(false)
+  const [makes, setMakes] = useState([])
+  const [models, setModels] = useState([])
+
+
+  const {
+    addVehicle, vehicles,
+    updateVehicle, removeVehicle,
+    setActiveVehicle, activeVehicle
+  } = useVehicleContext()
+
+  const toggleModal = () => setLogModalOpen(logModalOpen => !logModalOpen)
 
   useEffect(()=>{
     if(make && make.name){
@@ -37,7 +46,6 @@ const Dashboard = () => {
     }
   }, [make])
 
-   const { addVehicle } = useVehicleContext()
 
    const handleChange = ({ target: { name, value } }) => {
     //workaround mutating state directly...
@@ -76,7 +84,7 @@ const Dashboard = () => {
   const updateData = editedVehicle => {
     //Axios update will go here...
     //assing a copy of vehicle array with modified value for the editedVehicle.
-    const vehicleDatabase = this.state.vehicleDatabase.map(vehicle => {
+    const vehicleDatabase = vehicles.map(vehicle => {
       return vehicle._id === editedVehicle._id ? editedVehicle : vehicle;
     })
     //set new state
@@ -124,6 +132,7 @@ const Dashboard = () => {
   }
     return (
       <Container>
+        <OdometerLog logModalOpen={logModalOpen} toggleModal={toggleModal}/>
         {off ? (
             <>
             <h1>Vehicle Dashboard</h1>
@@ -142,9 +151,9 @@ const Dashboard = () => {
           model={model}
           year={year}
           />
-          <VehicleList openAddJobForm={openAddJobForm} updateData={updateData} deleteData={deleteData}/>
+          <VehicleList toggleLogModal={toggleModal} openAddJobForm={openAddJobForm} updateData={updateData} deleteData={deleteData}/>
           </>
-          ) : activeVehicle ? (
+          ) : activeVehicle.model.year ? (
               <AddJob activeVehicle={activeVehicle} toggle={toggle}/>
         ) : null
         }
@@ -152,7 +161,7 @@ const Dashboard = () => {
     );
   }
 
-const VehicleList = ({updateData, deleteData, openAddJobForm}) => {
+const VehicleList = ({updateData, deleteData, openAddJobForm, toggleLogModal}) => {
   const { vehicles } = useVehicleContext()
   const { on, off, toggle } = useToggleContext()
 
@@ -162,6 +171,7 @@ const VehicleList = ({updateData, deleteData, openAddJobForm}) => {
           {vehicles.map((vehicle, key) => (
             <VehihcleCard
               {...vehicle}
+              toggleLogModal={toggleLogModal}
               currentOdometerReading={vehicle.currentOdometerReading}
               openAddJobForm={openAddJobForm}
               toggle={toggle}
@@ -176,125 +186,4 @@ const VehicleList = ({updateData, deleteData, openAddJobForm}) => {
   )
 }
 
-export default requireAuth(Dashboard);
-
-const dummyDB = [
-  {
-    "id": "348tewhrgfi3u4asd5htwgfe978rhf",
-    "make": "Volvo",
-    "model": "S40 T5",
-    "year": 2008,
-    "services": {
-      "oilChange": {
-        "id_oc": "348tewhrgfi3wefweu45htwgfe978rhf",
-        "mileage": 75000,
-        "oilType": "5W-30",
-        "filter": "Mann-Filter HU 719/8",
-        "reminder": true,
-        "reminderInterval": 10000
-      },
-      "tires": {
-        "id_ti": "348tewhrgfi3u45htwgfe978rhf",
-        "mileage": 82091,
-        "reminder": true,
-        "reminderInterval": 10000,
-        "size": {
-          "front": "205/50R17",
-          "rear": "205/50R17"
-        }
-      },
-      "brakes": {
-        "mileage": {
-          "id_bf": "348tewhrgf453t6i3u45htwgfe978rhf",
-          "front": {
-            "mileage": 67635,
-            "rotation": false,
-            "reminder": true,
-            "reminderInterval": 10000
-          },
-          "rear": {
-            "id_br": "348tewhrgfidsaff3u45htwgfe978rhf",
-            "mileage": 63435,
-            "rotation": false,
-            "reminder": true,
-            "reminderInterval": 10000
-          }
-        }
-      },
-      "registration": {
-        "id_re": "348tewhrgfi3u43gyj45htwgfe978rhf",
-        "date": "02/12/2018",
-        "state": "CA",
-        "reminder": true,
-        "reminderInterval": 10000
-      },
-      "custom": {
-        "id_cu": "348tewhrgfi3u45htwdfgaseerytgfe978rhf",
-        "mileage": 67309,
-        "customName": "Timing Belt",
-        "customDesc": "changed timing belt",
-        "reminder": true,
-        "reminderInterval": 10000
-      }
-    }
-  },
-  {
-    "id": "534643456rgfi3u4asd5htwgfe978rhf",
-    "make": "Lexus",
-    "model": "IS300",
-    "year": 2008,
-    "services": {
-      "oilChange": {
-        "id_oc": "534643456348tewhrgfi3wefweu45htwgfe978rhf",
-        "mileage": 175000,
-        "oilType": "5W-30",
-        "filter": "Bosch",
-        "reminder": true,
-        "reminderInterval": 10000
-      },
-      "tires": {
-        "id_ti": "534643456348tewhrgfi3u45htwgfe978rhf",
-        "mileage": 182091,
-        "reminder": true,
-        "reminderInterval": 10000,
-        "size": {
-          "front": "215/45R17",
-          "rear": "215/45R17"
-        }
-      },
-      "brakes": {
-        "mileage": {
-          "id_bf": "534643456348tewhrgf453t6i3u45htwgfe978rhf",
-          "front": {
-            "mileage": 167635,
-            "rotation": false,
-            "reminder": true,
-            "reminderInterval": 10000
-          },
-          "rear": {
-            "id_br": "534643456348tewhrgfidsaff3u45htwgfe978rhf",
-            "mileage": 163435,
-            "rotation": false,
-            "reminder": true,
-            "reminderInterval": 10000
-          }
-        }
-      },
-      "registration": {
-        "id_re": "534643456348tewhrgfi3u43gyj45htwgfe978rhf",
-        "date": "02/12/2018",
-        "state": "CA",
-        "reminder": true,
-        "reminderInterval": 10000
-      },
-      "custom": {
-        "id_cu": "534643456348tewhrgfi3u45htwdfgaseerytgfe978rhf",
-        "mileage": 167309,
-        "customName": "Timing Belt",
-        "customDesc": "changed timing belt",
-        "reminder": true,
-        "reminderInterval": 10000
-      }
-    }
-  }
-]
+export default requireAuth(Dashboard)

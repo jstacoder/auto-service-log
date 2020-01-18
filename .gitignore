@@ -28,3 +28,4 @@ yarn-error.log*
 /client/yarn.lock
 package-lock.json
 yarn.lock
+client/data

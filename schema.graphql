@@ -364,6 +364,11 @@ type Query {
   """
   getJob(id: ID!): Job!
 
+  """
+    get the odometer history for a vehicle
+  """
+  getOdometerHistory(vehicle: ID!): VehicleOdometerHistory!
+
 }
 
 type Mutation {

@@ -1,11 +1,13 @@
 import React, {useState} from 'react'
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Button, Modal, ModalHeader, ModalBody } from 'reactstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useVehicleContext } from '../../contexts/VehicleContext'
 
-export const SettingsGroup = ({className, handleEditClick, handleDeleteClick, vehicle}) => {
+export const SettingsGroup = ({className, handleEditClick, handleDeleteClick, toggleLogModal, vehicle}) => {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [modal, setModal] = useState(false)
   const [displayLog, setDisplayLog] = useState(false)
+  const { setActiveVehicle } = useVehicleContext()
 
   const showLog = () => setDisplayLog(true)
   const hideLog = () => setDisplayLog(false)
@@ -28,7 +30,8 @@ export const SettingsGroup = ({className, handleEditClick, handleDeleteClick, ve
   }
 
   const onLogClick = ()=>{
-
+      setActiveVehicle(vehicle)
+      toggleLogModal()
   }
 
   return (

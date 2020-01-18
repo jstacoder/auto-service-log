@@ -5,7 +5,9 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCogs } from '@fortawesome/free-solid-svg-icons';
 
 import React, { Component } from "react";
-import { Route, Switch, withRouter } from "react-router-dom";
+import { Route, Switch } from 'react-router'
+import { BrowserRouter as Router } from "react-router-dom";
+import { createBrowserHistory } from 'history'
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -26,6 +28,7 @@ class App extends Component {
   render() {
     return (
           <div>
+                <Router history={createBrowserHistory()}>
             <ToggleContextProvider>
             <VehicleContextProvider>
               <ServiceContextProvider>
@@ -46,9 +49,10 @@ class App extends Component {
               </ServiceContextProvider>
             </VehicleContextProvider>
             </ToggleContextProvider>
+                </Router>
           </div>
     );
   }
 }
 
-export default withRouter(App);
+export default App

@@ -28,19 +28,20 @@ export const signout = () => {
     };
 };
 
-export const signin = (formProps, callback) => async dispatch => {
-    try {
-      const response = await axios.post(
+export const doSignin = async (dispatch, formProps, callback) => {
+  try {
+    const response = await axios.post(
         "http://localhost:5000/signin",
         formProps
-      );
-      //dispatch aut user payload response of token
-      dispatch({ type: AUTH_USER, payload: response.data.token });
-      //set token in localStorage for auth memory
-      localStorage.setItem("token", response.data.token);
-      //callback to SignUp function trigger re-direct
-      callback();
-    } catch (e) {
-      dispatch({ type: AUTH_ERROR, payload: "Invalid email or password." });
-    }
-  };
+    );
+    //dispatch aut user payload response of token
+    dispatch({ type: AUTH_USER, payload: response.data.token });
+    //set token in localStorage for auth memory
+    localStorage.setItem("token", response.data.token);
+    //callback to SignUp function trigger re-direct
+    callback(null, response.data)
+  } catch (e) {
+    dispatch({ type: AUTH_ERROR, payload: "Invalid email or password." });
+    callback(e, null)
+  }
+}
