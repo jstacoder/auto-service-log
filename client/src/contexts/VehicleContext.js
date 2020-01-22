@@ -80,17 +80,24 @@ export const VehicleContextProvider = ({children}) => {
     return readings || []
   }
   const addOdometerReading = async ({_id}, miles) => {
+    const today = new Date
+    const monthStart = today.getMonth()+1
+    const month = `${monthStart < 10 ? '0' : ''}${monthStart}`
+    const dayStart = today.getDate()
+    const day = `${dayStart < 10 ? '0' : ''}${dayStart}`
+    const dateCompleted = `${month}-${day}-${today.getFullYear()}`
     const { createOdometerReading: { ok, errors }} = await makeRequest(
         queries.createOdometerReading,
         {
           reading:{
             miles,
             vehicle: {_id},
-          }
+            }
         })
     if(errors){
 
     }
+    setOdometerReadings(odometerReadings=> [{miles, dateCompleted, vehicle: { _id}}, ...odometerReadings])
   }
 
   useEffect(()=>{

@@ -41,7 +41,7 @@ const getVehicles = () => {
         reject(err)
       }
       resolve(
-          results.map(
+          results && results.map(
               result=>(
                   {
                     currentOdometerReading: result.currentOdometerReading,
@@ -100,7 +100,7 @@ const getServices = () => {
           if (err) {
             reject(err)
           }
-          resolve(results.map(result=>{
+          resolve(results && results.map(result=>{
             return {
               ...result,
               name: result.name,
@@ -139,15 +139,23 @@ const getJob = (obj, args) => {
 const getOdometerHistory = (obj, args) => {
   return new Promise((resolve, reject)=>{
     Vehicle.findById(args.vehicle, (err, vehicle)=>{
-      OdometerReading.find({vehicle: {_id: vehicle._id}}).sort('-dateCompleted').exec((err, readings)=> {
-        if (err) {
-          reject(err)
-        }
-        resolve({
-          vehicle,
-          readings,
-        })
-      })
+      OdometerReading.aggregate()
+      .match({ vehicle: { _id: vehicle._id } })
+      .sort('-dateCompleted')
+      .project(
+          {
+              miles: "$$ROOT.miles",
+              dateCompleted:
+                { $dateToString:
+                      {
+                        date: '$dateCompleted',
+                        format: '%m-%d-%Y'
+                      }
+                }
+          }
+      ).limit(10)
+      .exec((err, readings)=> { if (err) { reject(err) } resolve({ vehicle, readings, }) })
+      //OdometerReading.find({vehicle: {_id: vehicle._id}}).sort('-dateCompleted')
     })
   })
 }

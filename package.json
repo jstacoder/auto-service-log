@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "MONGODB_URI=mongodb://auto-service-log:qweqweqwe1@ds259528.mlab.com:59528/auto-service-log SECRET=dsfsdf nodemon server.js"
+    "start": "SECRET=dsfsdf nodemon server.js"
   },
   "repository": {
     "type": "git",

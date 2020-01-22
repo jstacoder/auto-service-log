@@ -4,7 +4,8 @@ import {
   Modal,
   ModalBody,
   ModalFooter,
-  ModalHeader
+  ModalHeader,
+  Table,
 } from 'reactstrap'
 import { useVehicleContext } from '../contexts/VehicleContext'
 
@@ -45,7 +46,23 @@ export const OdometerLog = ({logModalOpen, toggleModal}) => {
            { !formOpen ? (
                <div>
               <p>Mileage Log:</p>
-              {odometerReadings.map(({miles, dateCompleted}) => <p>{miles} miles on {dateCompleted}</p>)}
+                 <Table bordered hover>
+                   <tr>
+                     <th>
+                       Miles
+                     </th>
+                    <th>
+                      Date
+                    </th>
+                   </tr>
+              {
+                odometerReadings.map(({miles, dateCompleted}) =>(
+                    <tr key={miles.toString()}>
+                      <td>{miles}</td>
+                      <td>{dateCompleted}</td>
+                    </tr>
+                ))}
+                 </Table>
               </div>
               ) : (
                 <form onSubmit={submit}>
