@@ -200,7 +200,7 @@ const createOdometerReading = (obj, {input}, context, info) =>{
         reject({errors: [err], ok: false})
       }
       Vehicle.updateOne({_id: result.vehicle._id}, { $set: {currentOdometerReading: result.miles}}, (err, vehicle)=>{
-          resolve({ ok: true })
+          resolve({ ok: true, reading : result})
       })
     })
   })

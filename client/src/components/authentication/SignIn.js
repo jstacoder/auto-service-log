@@ -59,7 +59,7 @@ export const SignIn  = props => {
 }
 
 
-export default SignIn
+export default reduxForm({ form: 'signin' })(SignIn)
   // export default compose(
   //   connect(mapStateToProps, actions),
   //   reduxForm({ form: 'signin' })

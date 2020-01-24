@@ -1,223 +1,182 @@
-"""
-  a date in the form of YYYY-MM-DD
-"""
-scalar Date
-"""
-  a 4 digit year
-"""
-scalar Year
-"""
-  a number of months ie: 4 = four months
-"""
-scalar Month
-"""
-  a number of days ie: 6 = six days
-"""
-scalar Day
-"""
-  a number of hours ie: 3 = three hours
-"""
-scalar Hour
-"""
-  a number of minutes ie: 9 = nine minutes
-"""
-scalar Minute
-"""
-  a number of seconds ie: 15 = fifteen seconds
-"""
-scalar Second
+# This file was generated based on ".graphqlconfig". Do not edit manually.
 
-scalar DateTime
-
-interface ShortInterval {
-  minutes: Minute
-  hours: Hour
-  days: Day
+schema {
+  query: Query
+  mutation: Mutation
 }
 
-interface LongInterval {
-  months: Month
-  years: Year
-  miles: Int
-}
-
-type EstimatedTimeToCompleteType implements ShortInterval {
-  minutes: Minute
-  hours: Hour
-  days: Day
-}
-
-type ServiceIntervalType implements LongInterval {
-  months: Month
-  years: Year
-  miles: Int
-}
-
-input EstimatedTimeToCompleteInput {
-  minutes: Minute
-  hours: Hour
-  days: Day
-}
-
-input ServiceIntervalInput {
-  months: Month
-  years: Year
-  miles: Int
-}
-
-"""
-  a generic service
-"""
-interface IService {
-  """
-    the name of the service
-  """
-  name: String!
-  """
-    how long it should take
-  """
-  estimatedTimeToComplete: EstimatedTimeToCompleteType
-  """
-    how hard is it
-  """
-  difficulty: Difficulty
-  """
-    when should we be reminded to do it again
-  """
-  suggestedServiceInterval: ServiceIntervalType
-  """
-    materials etc...
-  """
-  notes: String
-}
-
-"""
-  a generic mutation result, add ok
-"""
-interface IResult{
-  """
-    did the request succeed
-  """
+"a generic mutation result, add ok"
+interface IResult {
+  "did the request succeed"
   ok: Boolean
 }
 
-
-
-"""
-  a recording of a given vehicles odometer at a given date/time
-"""
-type OdometerType {
-  miles: String!
-  dateCompleted: DateTime!
-}
-"""
-  a history of od readings for a vehicle
-"""
-type VehicleOdometerHistory {
-  vehicle: Vehicle!
-  readings: [OdometerType!]!
-}
-
-input OdometerInput {
-  miles: String!
-}
-
-"""
-  a vehicle manufacturer
-"""
-type Make {
-  """
-    the manufacturers name
-  """
+"a generic service"
+interface IService {
+  "how hard is it"
+  difficulty: Difficulty
+  "how long it should take"
+  estimatedTimeToComplete: EstimatedTimeToCompleteType
+  "the name of the service"
   name: String!
-  """
-    the models manufacurered
-  """
-  models: [Model]!
+  "materials etc..."
+  notes: String
+  "when should we be reminded to do it again"
+  suggestedServiceInterval: ServiceIntervalType
 }
 
-"""
-  a vehicle model
-"""
-type Model {
-  """
-    the model name
-  """
-  name: String!
-  """
-    the model year
-  """
-  year: Year!
+interface LongInterval {
+  miles: Int
+  months: Month
+  years: Year
 }
 
-"""
-  a specific vehicle (combanation of make, model and year)
-"""
-type Vehicle {
-  """
-    the vehicles make
-  """
-  make: Make!
-  """
-    the vehicles model
-  """
-  model: Model!
-  """
-    the models trim level
-  """
-  trim: String
-  """
-    latest odometer reading
-  """
-  currentOdometerReading: Int
+interface ShortInterval {
+  days: Day
+  hours: Hour
+  minutes: Minute
+}
 
-  _id: ID!
+type EstimatedTimeToCompleteType implements ShortInterval {
+  days: Day
+  hours: Hour
+  minutes: Minute
 }
 
 type Garage {
   vehicles: [Vehicle]!
 }
 
-"""
-  a specific service that may be done
-"""
-type Service implements IService {
-  name: String!
-  estimatedTimeToComplete: EstimatedTimeToCompleteType
-  difficulty: Difficulty
-  suggestedServiceInterval: ServiceIntervalType
-  notes: String
+"a record of a service being performed on vehicle"
+type Job {
+  _id: ID!
+  "how much did it cost"
+  cost: String
+  "date services performed"
+  dateCompleted: Date
+  "who performed the service: ie: diy"
+  performedBy: String!
+  "list of services performed"
+  servicesPerformed: [Service!]!
+  "how long did it take"
+  timeTaken: EstimatedTimeToCompleteType
+  "the vehicle the service was performed on"
+  vehicle: Vehicle
 }
 
-"""
-  a record of a service being performed on vehicle
-"""
-type Job {
-  """
-    list of services performed
-  """
-  servicesPerformed: [Service!]!
-  """
-    date services performed
-  """
-  dateCompleted: Date
-  """
-    who performed the service: ie: diy
-  """
-  performedBy: String!
-  """
-    how long did it take
-  """
-  timeTaken: EstimatedTimeToCompleteType
-  """
-    how much did it cost
-  """
-  cost: String
-  """
-    the vehicle the service was performed on
-  """
-  vehicle: Vehicle
+type JobResult implements IResult {
+  job: Job!
+  ok: Boolean
+}
+
+"a vehicle manufacturer"
+type Make {
+  "the models manufacurered"
+  models: [Model]!
+  "the manufacturers name"
+  name: String!
+}
+
+"a vehicle model"
+type Model {
+  "the model name"
+  name: String!
+  "the model year"
+  year: Year!
+}
+
+type Mutation {
+  "add a job to the db"
+  createJob(input: JobInput!): JobResult!
+  "add an entry to a vehicles odometer history"
+  createOdometerReading(input: OdometerReadingInput!): OdometerResult!
+  "add a service to the db"
+  createService(input: ServiceInput!): ServiceResult!
+  "add a vehicle to the db"
+  createVehicle(input: CreateVehicleInput!): VehicleResult!
+}
+
+type OdometerResult {
+  errors: [String]
+  ok: Boolean
+  reading: OdometerType!
+}
+
+"a recording of a given vehicles odometer at a given date/time"
+type OdometerType {
+  dateCompleted: DateTime!
+  miles: String!
+}
+
+type Query {
+  "get a specific job from the db"
+  getJob(id: ID!): Job!
+  "get a list of job done for a given vehicle"
+  getJobs(vehicle: ID!): [Job]!
+  "get a specific make"
+  getMake(name: String!): Make
+  "get a list of car manufacturers"
+  getMakes: [Make]
+  "get the models for a manufacture during a given year"
+  getModels(input: GetModelsInput!): [Model]
+  "get the odometer history for a vehicle"
+  getOdometerHistory(vehicle: ID!): VehicleOdometerHistory!
+  "get a specific service from the db"
+  getService(name: String): Service
+  "get a list of serivces stored in db"
+  getServices: [Service]!
+  "get a specific vehicle from the db"
+  getVehicle(_id: ID!): Vehicle!
+  "get a list of vehicles stored in db"
+  getVehicles: [Vehicle]
+}
+
+"a specific service that may be done"
+type Service implements IService {
+  difficulty: Difficulty
+  estimatedTimeToComplete: EstimatedTimeToCompleteType
+  name: String!
+  notes: String
+  suggestedServiceInterval: ServiceIntervalType
+}
+
+type ServiceIntervalType implements LongInterval {
+  miles: Int
+  months: Month
+  years: Year
+}
+
+type ServiceOut {
+  difficulty: Difficulty
+  estimatedTimeToComplete: EstimatedTimeToCompleteType
+  name: String
+  notes: String
+  suggestedServiceInterval: ServiceIntervalType
+}
+
+type ServiceResult implements IResult {
+  error: String
+  ok: Boolean
+  service: ServiceOut
+}
+
+"a specific vehicle (combanation of make, model and year)"
+type Vehicle {
   _id: ID!
+  "latest odometer reading"
+  currentOdometerReading: Int
+  "the vehicles make"
+  make: Make!
+  "the vehicles model"
+  model: Model!
+  "the models trim level"
+  trim: String
+}
+
+"a history of od readings for a vehicle"
+type VehicleOdometerHistory {
+  readings: [OdometerType!]!
+  vehicle: Vehicle!
 }
 
 type VehicleResult implements IResult {
@@ -225,57 +184,31 @@ type VehicleResult implements IResult {
   vehicle: Vehicle!
 }
 
-type OdometerResult {
-  ok: Boolean
-  errors: [String]
+enum Difficulty {
+  #super easy (should do myself)
+  EASY
+  #pretty tough, should think about letting a mechanic handle it
+  HARD
+  #tools or experience needed hard to get, let a pro do these
+  IMPOSSIBLE
+  #a litter harder, should still diy, but research more thouroughly first
+  INTERMEDIATE
 }
 
-type ServiceOut {
-  name: String
-  estimatedTimeToComplete: EstimatedTimeToCompleteType
-  difficulty: Difficulty
-  suggestedServiceInterval: ServiceIntervalType
-  notes: String
+input CreateVehicleInput {
+  make: MakeInput!
+  miles: String
+  model: ModelInput!
 }
 
-type ServiceResult implements IResult {
-  ok: Boolean
-  service: ServiceOut
-  error: String
+input EstimatedTimeToCompleteInput {
+  days: Day
+  hours: Hour
+  minutes: Minute
 }
-
-type JobResult implements IResult {
-  ok: Boolean
-  job: Job!
-}
-
 
 input FindServiceInput {
   name: String
-}
-
-input ServiceInput{
-  name: String!
-  estimatedTimeToComplete: EstimatedTimeToCompleteInput
-  difficulty: Difficulty
-  suggestedServiceInterval: ServiceIntervalInput
-  notes: String
-}
-
-input JobInput {
-  performedBy: String!
-  servicesPerformed: [FindServiceInput!]
-  timeTaken: String
-  cost: String
-  vehicle: VehicleInput!
-}
-
-input ModelInput {
-  name: String!
-}
-
-input MakeInput {
-  name: String!
 }
 
 input GetModelsInput {
@@ -283,118 +216,69 @@ input GetModelsInput {
   year: Year!
 }
 
-input CreateVehicleInput {
-  make: MakeInput!
-  model: ModelInput!
-  miles: String
+input JobInput {
+  cost: String
+  performedBy: String!
+  servicesPerformed: [FindServiceInput!]
+  timeTaken: String
+  vehicle: VehicleInput!
+}
+
+input MakeInput {
+  name: String!
+}
+
+input ModelInput {
+  name: String!
+}
+
+input OdometerInput {
+  miles: String!
+}
+
+input OdometerReadingInput {
+  miles: String!
+  vehicle: VehicleInput!
+}
+
+input ServiceInput {
+  difficulty: Difficulty
+  estimatedTimeToComplete: EstimatedTimeToCompleteInput
+  name: String!
+  notes: String
+  suggestedServiceInterval: ServiceIntervalInput
+}
+
+input ServiceIntervalInput {
+  miles: Int
+  months: Month
+  years: Year
 }
 
 input VehicleInput {
   _id: ID!
 }
 
-input OdometerReadingInput {
-  vehicle: VehicleInput!
-  miles: String!
-}
 
+"a 4 digit year"
+scalar Year
 
-enum Difficulty {
-  """
-    super easy (should do myself)
-  """
-  EASY
-  """
-    a litter harder, should still diy, but research more thouroughly first
-  """
-  INTERMEDIATE
-  """
-    pretty tough, should think about letting a mechanic handle it
-  """
-  HARD
-  """
-    tools or experience needed hard to get, let a pro do these
-  """
-  IMPOSSIBLE
-}
+"a number of minutes ie: 9 = nine minutes"
+scalar Minute
 
-type Query {
-  """
-    get a list of car manufacturers
-  """
-  getMakes: [Make]
+"a number of hours ie: 3 = three hours"
+scalar Hour
 
-  """
-    get a specific make
-  """
-  getMake(name: String!): Make
+"a number of days ie: 6 = six days"
+scalar Day
 
-  """
-    get the models for a manufacture during a given year
-  """
-  getModels(input: GetModelsInput!): [Model]
+"a number of months ie: 4 = four months"
+scalar Month
 
-  """
-    get a list of vehicles stored in db
-  """
-  getVehicles: [Vehicle]
+"a date in the form of YYYY-MM-DD"
+scalar Date
 
-  """
-    get a specific vehicle from the db
-  """
-  getVehicle(_id: ID!) : Vehicle!
+scalar DateTime
 
-  """
-    get a list of serivces stored in db
-  """
-  getServices: [Service]!
-
-  """
-    get a specific service from the db
-  """
-  getService(name: String): Service
-
-  """
-    get a list of job done for a given vehicle
-  """
-  getJobs(vehicle: ID!): [Job]!
-
-  """
-    get a specific job from the db
-  """
-  getJob(id: ID!): Job!
-
-  """
-    get the odometer history for a vehicle
-  """
-  getOdometerHistory(vehicle: ID!): VehicleOdometerHistory!
-
-}
-
-type Mutation {
-  """
-    add a vehicle to the db
-  """
-  createVehicle(input: CreateVehicleInput!): VehicleResult!
-  # removeVehicle(vehicle: ID!): RemovedResult!
-  """
-    add a service to the db
-  """
-  createService(input: ServiceInput!): ServiceResult!
-  # removeService(service: ID!): RemovedResult!
-  """
-    add a job to the db
-  """
-  createJob(input: JobInput!): JobResult!
-  # removeJob(job: ID!): RemovedResult!
-
-  """
-    add an entry to a vehicles odometer history
-  """
-  createOdometerReading(input: OdometerReadingInput!): OdometerResult!
-}
-
-schema {
-  query: Query
-  mutation: Mutation
-}
+"a number of seconds ie: 15 = fifteen seconds"
+scalar Second

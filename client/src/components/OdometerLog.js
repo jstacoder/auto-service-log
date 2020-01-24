@@ -6,6 +6,7 @@ import {
   ModalFooter,
   ModalHeader,
   Table,
+  Input,
 } from 'reactstrap'
 import { useVehicleContext } from '../contexts/VehicleContext'
 
@@ -66,13 +67,13 @@ export const OdometerLog = ({logModalOpen, toggleModal}) => {
               </div>
               ) : (
                 <form onSubmit={submit}>
-                 <input value={newReading} onChange={updateReading} />
+                 <Input autoFocus value={newReading} onChange={updateReading} />
                 </form>
              )
             }
           </ModalBody>
           <ModalFooter>
-            <Button onClick={openForm}>add New</Button>
+            <Button color={!formOpen ? 'secondary' : 'success'} onClick={!formOpen ? openForm : submit}>{!formOpen ? 'Add New' : 'Save'}</Button>
             <Button onClick={toggleModal}>close</Button>
           </ModalFooter>
         </Modal>

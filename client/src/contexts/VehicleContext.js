@@ -52,6 +52,9 @@ const queries = {
       createOdometerReading(input: $reading){
         ok
         errors
+        reading {
+          dateCompleted
+        } 
       }
     }
   `
@@ -70,6 +73,7 @@ export const VehicleContext = createContext({
 
 export const VehicleContextProvider = ({children}) => {
   const [vehicleList, setVehicles] = useState( [])
+  const [loadingVehicles, setLoadingVehicles] = useState(false)
   const [activeVehicle, setActiveVehicle] = useState({make: '', model: {year: 0, name: ''}})
   const [odometerReadings, setOdometerReadings] = useState([])
 
@@ -86,7 +90,7 @@ export const VehicleContextProvider = ({children}) => {
     const dayStart = today.getDate()
     const day = `${dayStart < 10 ? '0' : ''}${dayStart}`
     const dateCompleted = `${month}-${day}-${today.getFullYear()}`
-    const { createOdometerReading: { ok, errors }} = await makeRequest(
+    const { createOdometerReading: { ok, errors, reading }} = await makeRequest(
         queries.createOdometerReading,
         {
           reading:{
@@ -97,9 +101,16 @@ export const VehicleContextProvider = ({children}) => {
     if(errors){
 
     }
-    setOdometerReadings(odometerReadings=> [{miles, dateCompleted, vehicle: { _id}}, ...odometerReadings])
+    setOdometerReadings(odometerReadings=> [{miles, dateCompleted: reading.dateCompleted, vehicle: { _id}}, ...odometerReadings])
   }
-
+  const loadVehicles = async ()=> {
+    if(!loadingVehicles) {
+      setLoadingVehicles(true)
+      const { vehicles } = await makeRequest(queries.getVehicles)
+      setVehicles(vehicles)
+      setLoadingVehicles(false)
+    }
+  }
   useEffect(()=>{
     const loadReadings = async () => {
       if(activeVehicle._id){
@@ -112,12 +123,12 @@ export const VehicleContextProvider = ({children}) => {
   }, [activeVehicle])
 
   useEffect(()=>{
-    const loadVehicles = async ()=> {
-      const { vehicles } = await makeRequest(queries.getVehicles)
-      setVehicles(vehicles)
-    }
     loadVehicles()
   }, [])
+  useEffect(()=>{
+    loadVehicles()
+  }, [odometerReadings])
+
 
 
   const addVehicle = async vehicle => {
