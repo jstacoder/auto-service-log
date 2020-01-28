@@ -5,7 +5,9 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCogs } from '@fortawesome/free-solid-svg-icons';
 
 import React, { Component } from "react";
-import { Route, Switch, withRouter } from "react-router-dom";
+import { Route, Switch } from 'react-router'
+import { BrowserRouter as Router } from "react-router-dom";
+import { createBrowserHistory } from 'history'
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -16,6 +18,9 @@ import SignUp from './components/authentication/SignUp';
 import SignOut from './components/authentication/SignOut';
 import SignIn from './components/authentication/SignIn';
 import { Services } from './pages/Services'
+import { ServiceContextProvider } from './contexts/ServiceContext'
+import { VehicleContextProvider } from './contexts/VehicleContext'
+import { ToggleContextProvider } from './components/Toggle'
 
 library.add(faCogs);
 
@@ -23,21 +28,31 @@ class App extends Component {
   render() {
     return (
           <div>
-            <Header />
-            <Switch>
-              <Route exact path="/" component={Home} />
-              <Route path="/signup" render={()=> <SignUp />} />
-              <Route path="/signout" render={()=> <SignOut />} />
-              <Route path="/signin" render={()=> <SignIn />} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/vehicle-details" component={VehicleDetails} />
-              <Route path="/services" component={Services}/>
-              <Route component={Error} />
-            </Switch>
-            <Footer />
+                <Router history={createBrowserHistory()}>
+            <ToggleContextProvider>
+            <VehicleContextProvider>
+              <ServiceContextProvider>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
+                <Header />
+                <Switch>
+                  <Route exact path="/" component={Home} />
+                  <Route path="/signup" render={()=> <SignUp />} />
+                  <Route path="/signout" render={()=> <SignOut />} />
+                  <Route path="/signin" render={()=> <SignIn />} />
+                  <Route path="/dashboard" component={Dashboard} />
+                  <Route path="/vehicle-details" component={VehicleDetails} />
+                  <Route path="/services" component={Services}/>
+                  <Route component={Error} />
+                </Switch>
+                <Footer />
+                </div>
+              </ServiceContextProvider>
+            </VehicleContextProvider>
+            </ToggleContextProvider>
+                </Router>
           </div>
     );
   }
 }
 
-export default withRouter(App);
+export default App

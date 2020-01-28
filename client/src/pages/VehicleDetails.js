@@ -1,22 +1,15 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-export default class VehicleDetails extends Component {
-    constructor(props) {
-      super(props)
-    
-      this.state = {}
-    }
-
-    render() {
-        const { make, model, year } = this.props.location.state;
-    
-        return (
-          <div>
+export const VehicleDetails = props => {
+  const { make, model } = props.location.state;
+  return (
+      <div>
             <h1>VehicleDetails Page</h1>
             <h2>{make}</h2>
-            <h2>{model}</h2>
-            <h2>{year}</h2>
+            <h2>{model.name}</h2>
+            <h2>{model.year}</h2>
           </div>
-        );
-      }
-    }
+  );
+}
+
+export default VehicleDetails

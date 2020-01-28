@@ -9,6 +9,8 @@ const _ = require('lodash')
 const Vehicle = require('../models/Vehicle')
 const Service = require('../models/Service')
 const Job = require('../models/Job')
+const OdometerReading = require('../models/OdometerReading')
+const async = require('async')
 
 const getMakes = module.exports.getMakes = async (obj, args, context, info) => {
   const url =  `https://vpic.nhtsa.dot.gov/api/vehicles/getallmanufacturers?format=json`
@@ -34,11 +36,23 @@ const getMake = async name => {
 
 const getVehicles = () => {
   return new Promise((resolve, reject)=>{
-    Vehicle.find((err, results)=>{
+    Vehicle.find({}, (err, results)=>{
       if(err){
         reject(err)
       }
-      resolve(results.map(result=>({make: {name: result.make}, model: {name: result.model}, year: result.year, _id: result._id})))
+      resolve(
+          results && results.map(
+              result=>(
+                  {
+                    currentOdometerReading: result.currentOdometerReading,
+                    make: result.make,
+                    model:
+                        {name: result.model.name, year: result.model.year},
+
+                    _id: result._id
+                  })
+          )
+      )
     })
   })
 }
@@ -46,20 +60,19 @@ const getVehicles = () => {
 const getVehicle = (obj, {_id})=>{
   return new Promise((resolve, reject)=>{
     Vehicle.findOne({_id}, (err, result)=>{
-      if(err){
-        reject(err)
-      }
-      resolve({
-        make: {
-          name: result.make,
-        },
-        model: {
-          name: result.model,
-        },
-        year: result.year,
-        _id: result._id,
+        if (err) {
+          reject(err)
+        }
+        resolve({
+          ...result,
+          make: {
+            name: result.make,
+          },
+          model: result.model,
+          currentOdometerReading: result.currentOdometerReading,
+          _id: result._id,
+        })
       })
-    })
   })
 }
 
@@ -87,13 +100,13 @@ const getServices = () => {
           if (err) {
             reject(err)
           }
-          resolve(results.map(result=>{
+          resolve(results && results.map(result=>{
             return {
               ...result,
               name: result.name,
               difficulty: result.difficulty,
-              suggestedServiceInterval: [result.suggestedServiceInterval],
-              estimatedTimeToComplete: [result.estimatedTimeToComplete],
+              suggestedServiceInterval: result.suggestedServiceInterval,
+              estimatedTimeToComplete: result.estimatedTimeToComplete,
               notes: result.notes,
             }
           }))
@@ -104,31 +117,149 @@ const getServices = () => {
 
 const getService = (_id) =>{}
 
-const getJobs = () => {}
-
-const getJob = (_id) => {}
+const getJobs = (obj, {vehicle: vehicleId}) => {
+  return new Promise((resolve, reject)=>{
+    Job.find({vehicle: { _id: vehicleId }}, (err, jobs)=>{
+      if(err){
+        reject(err)
+      }
+      Job.populate(jobs, 'servicesPerformed', ()=>{
+        resolve(jobs)
+      })
+    })
+  })
+}
+const getJob = (obj, args) => {
+  return new Promise((resolve, reject)=>{
+    Job.findById(args.id, (err, job)=>{
+      resolve(job)
+    })
+  })
+}
+const getOdometerHistory = (obj, args) => {
+  return new Promise((resolve, reject)=>{
+    Vehicle.findById(args.vehicle, (err, vehicle)=>{
+      OdometerReading.aggregate()
+      .match({ vehicle: { _id: vehicle._id } })
+      .sort('-dateCompleted')
+      .project(
+          {
+              miles: "$$ROOT.miles",
+              dateCompleted:
+                { $dateToString:
+                      {
+                        date: '$dateCompleted',
+                        format: '%m-%d-%Y'
+                      }
+                }
+          }
+      ).limit(10)
+      .exec((err, readings)=> { if (err) { reject(err) } resolve({ vehicle, readings, }) })
+      //OdometerReading.find({vehicle: {_id: vehicle._id}}).sort('-dateCompleted')
+    })
+  })
+}
 
 const createVehicle = (obj, {input: {make, model, year}}, context, info) => {
   const vehicle = new Vehicle({make: make.name, model: model.name, year})
   return vehicle.save().then(vehicle => ({ ok: true, vehicle: { make, model, year} }))
 }
+const createService = (obj, {input}, context, info)=> {
+  const service = new Service({
+    ...input,
+  })
+  return new Promise((resolve, reject) => {
+    service.save((err, result) => {
+      if (err) {
+        reject(err)
+      }
+      resolve({ ok: true, service })
+    })
+  })
+}
+const createJob = (obj, {input}, context, info)=>{
+  const job = new Job({
+    ...input,
+    date: Date.now()
+  })
+  return new Promise((resolve, reject)=>{
+    job.save((err, result)=>{
+      if(err){
+        reject(err)
+      }
+      resolve({ok: true, job: result})
+    })
+  })
+}
+
+const createOdometerReading = (obj, {input}, context, info) =>{
+  const reading = new OdometerReading({...input})
+  return new Promise((resolve, reject)=>{
+    reading.save((err, result)=>{
+      if(err){
+        reject({errors: [err], ok: false})
+      }
+      Vehicle.updateOne({_id: result.vehicle._id}, { $set: {currentOdometerReading: result.miles}}, (err, vehicle)=>{
+          resolve({ ok: true, reading : result})
+      })
+    })
+  })
+}
+
+
 const resolvers = {
-  Query:{
+  Query: {
     getMake,
     getMakes,
     getModels,
     getVehicles,
     getVehicle,
     getServices,
+    getJobs,
+    getJob,
+    getOdometerHistory,
   },
   Mutation: {
     createVehicle,
+    createService,
+    createJob,
+    createOdometerReading,
   },
   Make: {
     models(obj, args, context, info) {
       return getModels(obj, args, context, info)
     }
   },
+  Job: {
+    servicesPerformed(obj, args) {
+      return obj.servicesPerformed.map(name=>({name}))
+    }
+  }
+  ,
+  // Vehicle: {
+  //   model(obj, args){
+  //     console.log(obj)
+  //     return new Promise((resolve, reject)=>{
+  //       Vehicle.findOne(obj, (err, vehicle)=>{
+  //         Vehicle.populate(vehicle, 'model', (err)=>{
+  //           resolve(vehicle.model)
+  //         })
+  //       })
+  //     })
+  //   },
+  //   make(obj, args, context, info){
+  //     return new Promise((resolve, reject)=>{
+  //       Vehicle.findOne(obj, (err, vehicle)=>{
+  //         if(err){
+  //           reject(err)
+  //         }
+  //         Vehicle.populate(vehicle, 'make', (err)=>{
+  //           resolve(vehicle.make)
+  //         })
+  //       })
+  //     })
+  //   }
+  // }
 }
 
 const typeDefs = fs.readFileSync('./schema.graphql').toString()

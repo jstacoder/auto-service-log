@@ -1,24 +1,36 @@
-import { Component } from "react";
+import React, { useState, useEffect, createContext, useContext } from "react";
 
-export default class Toggle extends Component {
-  state = {
-    on: false,
-    off: true
-  };
+export const ToggleContext = createContext({on: false, off: true, toggle: ()=> {}})
 
-  toggle = () => {
-    this.setState({
-      on: !this.state.on,
-      off: !this.state.off
-    });
-  };
+export const ToggleContextProvider = ({children})=>{
+  const [on, setOn] = useState(false)
+  const [off, setOff] = useState(true)
 
-  render() {
-    const { children } = this.props;
-    return children({
-      on: this.state.on,
-      off: this.state.off,
-      toggle: this.toggle
-    });
+  const toggle = () =>{
+    setOn(oldOn => !oldOn)
+    setOff(oldOff => !oldOff)
   }
+
+  const value = {
+    on,
+    off,
+    toggle,
+  }
+  return (
+      <ToggleContext.Provider value={value}>
+        {children}
+      </ToggleContext.Provider>
+  )
 }
+
+export const useToggleContext = () => useContext(ToggleContext)
+
+export const Toggle = ({children, ...props}) => {
+  const { on, off, toggle } = useContext(ToggleContext)
+
+  return (
+      children({on, off, toggle})
+  )
+}
+
+export default Toggle

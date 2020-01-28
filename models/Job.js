@@ -4,15 +4,27 @@ const { ServiceSchema } = require('./Service')
 const { VehicleSchema } = require('./Vehicle')
 
 const JobSchema = new Schema({
-  servicesPerformed: [ServiceSchema],
+  servicesPerformed: [
+       String
+  ],
   dateCompleted: {
      type: Date,
      default: Date.now(),
   },
   performedBy: String,
-  timeTaken: String,
+  timeTaken: {
+    minutes: Number,
+    hours: Number,
+    days: Number,
+  },
   cost: String,
   vehicle: VehicleSchema,
+})
+
+JobSchema.virtual('services', {
+  ref: 'Service',
+  localField: 'servicesPerformed',
+  foreignField: 'name',
 })
 
 exports = module.exports = mongoose.model('Job', JobSchema )

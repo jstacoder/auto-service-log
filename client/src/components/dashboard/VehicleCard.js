@@ -1,83 +1,101 @@
-import React, { Fragment } from "react";
-import { withRouter } from "react-router-dom";
+import React, { Fragment, useState } from "react";
+import { useHistory } from 'react-router'
 import { Col, Card, CardTitle, CardSubtitle, Button } from "reactstrap";
 import SettingsGroup from "./SettingsGroup";
 import VehicleEditForm from "./VehicleEditForm";
 
-class VehicleCard extends React.Component {
-  state = {
-    //Toggle state to conditional rendering
-    toggleEdit: false
-  };
+const VehicleCard  = props => {
+  const history = useHistory()
 
-  handleEditClick = () => {
+  //Toggle state to conditional rendering
+  const [toggleEdit, setToggleEdit] = useState(false)
+
+  const addJob = () =>{
+    props.openAddJobForm(props)
+  }
+
+  const handleEditClick = () => {
     //show edit form when clicking initial edit button
-    this.setState({
-      toggleEdit: true
-    });
-  };
+    setToggleEdit(true)
+  }
 
-  handleEditSubmit = editedValues => {
-    //assing to edited field comming from VehicleEditForm the id of the student
-    editedValues.id = this.props.id;
+  const handleEditSubmit = editedValues => {
+    // assign to edited field coming from VehicleEditForm the id of the student
+    editedValues.id = props.id;
     //call updateData function in App with editedValues
-    this.props.updateData(editedValues);
+    props.updateData(editedValues);
     //change state to render student card
-    this.setState({
-      toggleEdit: false
-    });
-  };
+    setToggleEdit(false)
+  }
 
-  handleCancelSubmit = () => {
+  const handleCancelSubmit = () => {
     //change state to render student card
-    this.setState({
-      toggleEdit: false
-    });
-  };
+    setToggleEdit(false)
+  }
 
-  handleDeleteClick = () => {
+  const handleDeleteClick = () => {
     //call deleteData function on app with vehicleId
-    const vehicleId = this.props.id;
-    this.props.deleteData(vehicleId);
-  };
+    const vehicleId = props.id
+    props.deleteData(vehicleId)
+  }
 
-  handleDetailClick = () => {
+  const handleDetailClick = () => {
     //deconstruct props
-    const { id, make, model, year } = this.props;
+    const { _id, make, model } = props
     //assign them to an object to be pushed
     //const propsToPush = { make, model, year };
     // use React-Router-Dom history.push to go to new page and send props
-    this.props.history.push({
+    history.push({
       pathname: "/vehicle-details",
-      state: { id, make, model, year }
-    });
-  };
+      state: { id: _id, make, model: model.name, year: model.year }
+    })
+  }
 
   // this renderContent function written outside render method to use if statement
-  renderContent = () => {
+  const renderContent = () => {
     //deconstruct props
-    const { id, make, model, year } = this.props;
+    console.log(props)
+    const { _id, make, model, currentOdometerReading } = props
     //if toggleEdit is false show student card
-    if (!this.state.toggleEdit) {
+    if (!toggleEdit) {
       return (
         <Fragment>
           <Col className="mt-2 mb-4" md="6">
-            <Card body id={id}>
+            <Card body id={_id}>
               <CardTitle className="lead">{make}</CardTitle>
               <CardSubtitle className="text-muted">
-                {model} | {year}
+                {model.name} | {model.year}
+              </CardSubtitle>
+              <CardSubtitle tag={'p'}>
+                {currentOdometerReading}: mi
               </CardSubtitle>
               <div className="text-right">
+
+                  <Button
+                      onClick={addJob}
+                      color='success'
+                      className='mr-2'>
+                    Add Job
+                  </Button>
+                  <Button
+                    color='info'
+                    className='mr-2'
+                  >
+                    view jobs
+                  </Button>
                   <Button
                     className="mt-2 mb-2 mr-2"
                     color="primary"
-                    onClick={this.handleDetailClick}
+                    onClick={handleDetailClick}
                   >
                     Details
                   </Button>
+
                 <SettingsGroup
-                  handleEditClick={this.handleEditClick}
-                  handleDeleteClick={this.handleDeleteClick}
+                  vehicle={{make, model, _id}}
+                  handleEditClick={handleEditClick}
+                  handleDeleteClick={handleDeleteClick}
+                  toggleLogModal={props.toggleLogModal}
                 />
               </div>
             </Card>
@@ -88,17 +106,14 @@ class VehicleCard extends React.Component {
     return (
       //if toggleEdit is true show VehicleEditForm
       <VehicleEditForm
-        vehicleData={this.props}
-        editSubmit={this.handleEditSubmit}
-        cancelSubmit={this.handleCancelSubmit}
+        vehicleData={props}
+        editSubmit={handleEditSubmit}
+        cancelSubmit={handleCancelSubmit}
       />
     );
   };
 
-  render() {
-    return this.renderContent();
-  }
+    return renderContent()
 }
 
-//need to wrap in withRouter imported from React-Router to use history.push
-export default withRouter(VehicleCard);
+export default VehicleCard
