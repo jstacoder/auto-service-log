@@ -60,8 +60,8 @@ type Job {
   servicesPerformed: [Service!]!
   "how long did it take"
   timeTaken: EstimatedTimeToCompleteType
-  "the vehicle the service was performed on"
-  vehicle: Vehicle
+#  "the vehicle the service was performed on"
+#  vehicle: Vehicle
 }
 
 type JobResult implements IResult {
