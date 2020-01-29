@@ -1,0 +1,27 @@
+version: "2.0"
+
+
+services:
+    server:
+        image: "node:13.7-slim"
+        volumes: 
+            - ./:/app
+        command: "yarn start"
+        working_dir: /app
+        environment:
+            - MONGODB_URI=$MONGODB_URI
+            - PORT=$PORT
+        ports:
+            - "5005:5005"
+        depends_on:
+          - client
+
+
+    client:
+        image: "node:13.7"
+        volumes:
+            - ./client/:/app
+        command: "yarn start"
+        working_dir: /app
+        ports:
+            - "3005:3000"
