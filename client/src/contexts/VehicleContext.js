@@ -57,11 +57,32 @@ const queries = {
         } 
       }
     }
+  `,
+  // language=GraphQL
+  getJobs: `
+    query getJobs($vehicle: ID!){
+      jobs: getJobs(vehicle: $vehicle){
+        cost
+        servicesPerformed {
+          name
+        }
+        dateCompleted
+        performedBy 
+        timeTaken {
+          minutes
+          hours
+          days
+        }
+      }
+    }
+    
   `
 }
 
 export const VehicleContext = createContext({
   vehicles: [],
+  activeVehicle: null,
+  activeVehicleJobs: [],
   updateVehicle: vehicle=>{},
   getActiveVehicle: ()=>{},
   setActiveVehicle: vehicle=>{},
@@ -76,6 +97,9 @@ export const VehicleContextProvider = ({children}) => {
   const [loadingVehicles, setLoadingVehicles] = useState(false)
   const [activeVehicle, setActiveVehicle] = useState({make: '', model: {year: 0, name: ''}})
   const [odometerReadings, setOdometerReadings] = useState([])
+  const [activeVehicleJobs, setActiveVehicleJobs] = useState([])
+
+
 
   const getActiveVehicle = () => activeVehicle
 
@@ -111,6 +135,16 @@ export const VehicleContextProvider = ({children}) => {
       setLoadingVehicles(false)
     }
   }
+  useEffect(()=>{
+    const loadJobs = async () => {
+      if(activeVehicle._id){
+        const { jobs } = await makeRequest(queries.getJobs, {vehicle: activeVehicle._id})
+        console.log('got ', jobs)
+        setActiveVehicleJobs(jobs)
+      }
+    }
+    loadJobs()
+  }, [activeVehicle])
   useEffect(()=>{
     const loadReadings = async () => {
       if(activeVehicle._id){
@@ -153,6 +187,7 @@ export const VehicleContextProvider = ({children}) => {
     odometerReadings,
     activeVehicle,
     addOdometerReading,
+    activeVehicleJobs,
   }
 
   return (

@@ -3,8 +3,10 @@ import { useHistory } from 'react-router'
 import { Col, Card, CardTitle, CardSubtitle, Button } from "reactstrap";
 import SettingsGroup from "./SettingsGroup";
 import VehicleEditForm from "./VehicleEditForm";
+import { useVehicleContext } from '../../contexts/VehicleContext'
 
 const VehicleCard  = props => {
+  const { setActiveVehicle } = useVehicleContext()
   const history = useHistory()
 
   //Toggle state to conditional rendering
@@ -50,6 +52,10 @@ const VehicleCard  = props => {
       state: { id: _id, make, model: model.name, year: model.year }
     })
   }
+  const setViewingJobs = () =>{
+    setActiveVehicle(props)
+    props.setViewingJobs(true)
+  }
 
   // this renderContent function written outside render method to use if statement
   const renderContent = () => {
@@ -80,6 +86,7 @@ const VehicleCard  = props => {
                   <Button
                     color='info'
                     className='mr-2'
+                    onClick={()=> setViewingJobs()}
                   >
                     view jobs
                   </Button>

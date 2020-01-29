@@ -5,6 +5,7 @@ import {
   Container,
   Row,
 } from 'reactstrap'
+import { JobsList } from '../components/jobs/JobList'
 import { OdometerLog } from '../components/OdometerLog'
 import requireAuth from "../components/requireAuth";
 import AddVehicle from "../components/dashboard/AddVehicle";
@@ -24,6 +25,7 @@ const Dashboard = () => {
   const [loadingMakes, setLoadingMakes] = useState(false)
   const [makes, setMakes] = useState([])
   const [models, setModels] = useState([])
+  const [viewingJobs, setViewingJobs] = useState(false)
 
 
   const {
@@ -151,7 +153,8 @@ const Dashboard = () => {
           model={model}
           year={year}
           />
-          <VehicleList toggleLogModal={toggleModal} openAddJobForm={openAddJobForm} updateData={updateData} deleteData={deleteData}/>
+            {!viewingJobs && <VehicleList setViewingJobs={setViewingJobs} toggleLogModal={toggleModal} openAddJobForm={openAddJobForm} updateData={updateData} deleteData={deleteData}/>}
+            {!!viewingJobs && <JobsList/>}
           </>
           ) : activeVehicle.model.year ? (
               <AddJob activeVehicle={activeVehicle} toggle={toggle}/>
@@ -161,7 +164,7 @@ const Dashboard = () => {
     );
   }
 
-const VehicleList = ({updateData, deleteData, openAddJobForm, toggleLogModal}) => {
+const VehicleList = ({setViewingJobs, updateData, deleteData, openAddJobForm, toggleLogModal}) => {
   const { vehicles } = useVehicleContext()
   const { on, off, toggle } = useToggleContext()
 
@@ -171,6 +174,7 @@ const VehicleList = ({updateData, deleteData, openAddJobForm, toggleLogModal}) =
           {vehicles.map((vehicle, key) => (
             <VehihcleCard
               {...vehicle}
+              setViewingJobs={setViewingJobs}
               toggleLogModal={toggleLogModal}
               currentOdometerReading={vehicle.currentOdometerReading}
               openAddJobForm={openAddJobForm}
