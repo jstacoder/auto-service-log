@@ -11,7 +11,7 @@
     "bootstrap": "^4.2.1",
     "graphql-request": "^1.8.2",
     "history": "^4.10.1",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.1",
     "prop-types": "^15.6.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
@@ -22,11 +22,10 @@
     "reactstrap": "^7.0.2",
     "redux": "4.0.5",
     "redux-form": "^8.1.0",
-    "redux-thunk": "^2.3.0",
-    "sass-loader": "^7.1.0"
+    "redux-thunk": "^2.3.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "yarn install && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
