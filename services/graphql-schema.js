@@ -125,16 +125,16 @@ const getJobs = (obj, {vehicle: vehicleId}) => {
       if(err){
         reject(err)
       }
-//      Job.populate(jobs, 'servicesPerformed', ()=>{
-        console.log(jobs[0].servicesPerformed)
-        const servicesPerformed = jobs[0].servicesPerformed
-        jobs = jobs.map(job => ({
-          ...job._doc,
-          servicesPerformed: servicesPerformed.map(service=>(service.name)),
-        }))
+      Job.populate(jobs, 'services', ()=>{
+        // console.log(jobs[0].services)
+        // const services = jobs[0].services
+        // jobs = jobs.map(job => ({
+        //   ...job._doc,
+        //   services: services.map(service=>(service.name)),
+        // }))
       console.log(jobs)
         resolve(jobs)
-  //    })
+     })
     })
   })
 }
@@ -187,18 +187,16 @@ const createService = (obj, {input}, context, info)=> {
   })
 }
 const createJob = (obj, {input}, context, info)=>{
-  const job = new Job.createJob({
-    ...input,
-    dateCompleted: Date.now()
+  return new Promise((resolve, reject)=> {
+    Job.createJob({
+      ...input,
+      dateCompleted: Date.now()
+    }, (err, job) => {
+      console.log(job)
+      resolve({ ok: true, job})
+      })
   })
-  return new Promise((resolve, reject)=>{
-    job.save((err, result)=>{
-      if(err){
-        reject(err)
-      }
-      resolve({ok: true, job: result})
-    })
-  })
+
 }
 
 const createOdometerReading = (obj, {input}, context, info) =>{
@@ -239,12 +237,9 @@ const resolvers = {
       return getModels(obj, args, context, info)
     }
   },
-  Job: {
-    servicesPerformed(obj, args) {
-      return obj.servicesPerformed.map(name=>({name}))
-    }
-  }
-  ,
+
+
+
   // Vehicle: {
   //   model(obj, args){
   //     console.log(obj)

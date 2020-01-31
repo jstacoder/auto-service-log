@@ -18,7 +18,8 @@ interface IService {
   "how long it should take"
   estimatedTimeToComplete: EstimatedTimeToCompleteType
   "the name of the service"
-  name: String!
+
+  serviceName: String!
   "materials etc..."
   notes: String
   "when should we be reminded to do it again"
@@ -58,7 +59,7 @@ type Job {
   "who performed the service: ie: diy"
   performedBy: String!
   "list of services performed"
-  servicesPerformed: [Service!]!
+  services: [Service!]!
   "how long did it take"
   timeTaken: EstimatedTimeToCompleteType
   #  "the vehicle the service was performed on"
@@ -136,7 +137,7 @@ type Query {
 type Service implements IService {
   difficulty: Difficulty
   estimatedTimeToComplete: EstimatedTimeToCompleteType
-  name: String!
+  serviceName: String!
   notes: String
   suggestedServiceInterval: ServiceIntervalType
   id: ID!
@@ -227,7 +228,7 @@ input TimeTakenInput {
 input JobInput {
   cost: String
   performedBy: String!
-  servicesPerformed: [FindServiceInput!]
+  services: [String!]
   timeTaken: TimeTakenInput!
   vehicle: VehicleInput!
 }

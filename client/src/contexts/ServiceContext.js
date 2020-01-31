@@ -3,11 +3,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import { makeRequest } from '../helpers/graphql'
 
 const queries = {
+  // language=GraphQL
   getServices: `
     {
       services: getServices{
         id
-        name
+        serviceName
         difficulty
         estimatedTimeToComplete {
           minutes
@@ -23,12 +24,12 @@ const queries = {
       }
     }
   `,
+  // language=GraphQL
   createService: `
     mutation addService($service: ServiceInput!){
       createService(input: $service){
         ok
         service{
-          id
           name
           difficulty
           estimatedTimeToComplete {

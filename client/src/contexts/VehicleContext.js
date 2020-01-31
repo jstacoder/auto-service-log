@@ -63,8 +63,8 @@ const queries = {
     query getJobs($vehicle: ID!){
       jobs: getJobs(vehicle: $vehicle){
         cost
-        servicesPerformed {
-          name
+        services{
+          serviceName
           id
         }
         dateCompleted

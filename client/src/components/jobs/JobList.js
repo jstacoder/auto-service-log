@@ -9,7 +9,8 @@ const JobCard = ({job})=> {
         <CardTitle>{job.dateCompleted}</CardTitle>
         <CardBody>
           <CardText>{job.cost}</CardText>
-          <CardText>Done By: {job.performedBy}</CardText>
+          {job.services.map(service=> <CardText key={service.id}>{service.serviceName}</CardText> )}
+           <CardText>Done By: {job.performedBy}</CardText>
           <CardText>Time Taken:{' '}
             {!!job.timeTaken.days ? `${job.timeTaken.days} day${job.timeTaken.days === 1 ? '' : 's'} ` : ''}
             {!!job.timeTaken.hours ? `${job.timeTaken.hours} hour${job.timeTaken.hours === 1 ? '' : 's'} ` : '' }
@@ -25,7 +26,7 @@ export const JobsList = () =>{
 
   return (
       <div style={{border: '1px solid black'}}>
-        {activeVehicleJobs.map(job=><JobCard job={job}/>)}
+        {activeVehicleJobs.map(job=><JobCard key={JSON.stringify(job)} job={job}/>)}
       </div>
   )
 }

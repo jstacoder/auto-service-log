@@ -106,7 +106,7 @@ export const AddJob = ({toggle, activeVehicle}) =>{
 
     console.log(selectedServices)
     const job = {
-      servicesPerformed: selectedServices.map(({name})=> ({name})),
+      services: selectedServices.map(({name})=> name),
       performedBy,
       timeTaken,
       cost,
