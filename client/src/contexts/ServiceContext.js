@@ -6,6 +6,7 @@ const queries = {
   getServices: `
     {
       services: getServices{
+        id
         name
         difficulty
         estimatedTimeToComplete {
@@ -27,6 +28,7 @@ const queries = {
       createService(input: $service){
         ok
         service{
+          id
           name
           difficulty
           estimatedTimeToComplete {
@@ -77,7 +79,7 @@ export const ServiceContextProvider = ({children}) => {
     services: serviceList,
     addService,
     removeService,
-  }
+              }
 
   return (
       <ServiceContext.Provider value={value}>

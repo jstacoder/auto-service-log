@@ -23,6 +23,7 @@ interface IService {
   notes: String
   "when should we be reminded to do it again"
   suggestedServiceInterval: ServiceIntervalType
+  id: ID!
 }
 
 interface LongInterval {
@@ -60,8 +61,8 @@ type Job {
   servicesPerformed: [Service!]!
   "how long did it take"
   timeTaken: EstimatedTimeToCompleteType
-#  "the vehicle the service was performed on"
-#  vehicle: Vehicle
+  #  "the vehicle the service was performed on"
+  #  vehicle: Vehicle
 }
 
 type JobResult implements IResult {
@@ -138,6 +139,7 @@ type Service implements IService {
   name: String!
   notes: String
   suggestedServiceInterval: ServiceIntervalType
+  id: ID!
 }
 
 type ServiceIntervalType implements LongInterval {
@@ -216,11 +218,17 @@ input GetModelsInput {
   year: Year!
 }
 
+input TimeTakenInput {
+  minutes: Minute
+  hours: Hour
+  days: Day
+}
+
 input JobInput {
   cost: String
   performedBy: String!
   servicesPerformed: [FindServiceInput!]
-  timeTaken: String
+  timeTaken: TimeTakenInput!
   vehicle: VehicleInput!
 }
 

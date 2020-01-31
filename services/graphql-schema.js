@@ -101,8 +101,10 @@ const getServices = () => {
             reject(err)
           }
           resolve(results && results.map(result=>{
+            console.log(result)
             return {
               ...result,
+              id: result._id,
               name: result.name,
               difficulty: result.difficulty,
               suggestedServiceInterval: result.suggestedServiceInterval,
@@ -123,9 +125,16 @@ const getJobs = (obj, {vehicle: vehicleId}) => {
       if(err){
         reject(err)
       }
-      Job.populate(jobs, 'servicesPerformed', ()=>{
+//      Job.populate(jobs, 'servicesPerformed', ()=>{
+        console.log(jobs[0].servicesPerformed)
+        const servicesPerformed = jobs[0].servicesPerformed
+        jobs = jobs.map(job => ({
+          ...job._doc,
+          servicesPerformed: servicesPerformed.map(service=>(service.name)),
+        }))
+      console.log(jobs)
         resolve(jobs)
-      })
+  //    })
     })
   })
 }
@@ -178,9 +187,9 @@ const createService = (obj, {input}, context, info)=> {
   })
 }
 const createJob = (obj, {input}, context, info)=>{
-  const job = new Job({
+  const job = new Job.createJob({
     ...input,
-    date: Date.now()
+    dateCompleted: Date.now()
   })
   return new Promise((resolve, reject)=>{
     job.save((err, result)=>{

@@ -139,20 +139,25 @@ const Dashboard = () => {
             <>
             <h1>Vehicle Dashboard</h1>
             <p> Browse or add a vehicle</p>
-          <AddVehicle
-          onHandleChange={handleChange}
-          onHandleSubmit={handleSubmit}
-          onHandleYearChange={handleYearChange}
-          onHandleModelChange={handleModelChange}
-          onHandleMakeChange={handleMakeChange}
-          makes={makes}
-          models={models}
-          loadingMakes={loadingMakes}
-          loadingModels={loadingModels}
-          make={make}
-          model={model}
-          year={year}
-          />
+            { !viewingJobs &&
+              <AddVehicle
+                  onHandleChange={handleChange}
+                  onHandleSubmit={handleSubmit}
+                  onHandleYearChange={handleYearChange}
+                  onHandleModelChange={handleModelChange}
+                  onHandleMakeChange={handleMakeChange}
+                  makes={makes}
+                  models={models}
+                  loadingMakes={loadingMakes}
+                  loadingModels={loadingModels}
+                  make={make}
+                  model={model}
+                  year={year}
+              />
+            }
+            {!!viewingJobs &&
+                  <Button onClick={ ()=> setViewingJobs(false)}>Go Back</Button>
+            }
             {!viewingJobs && <VehicleList setViewingJobs={setViewingJobs} toggleLogModal={toggleModal} openAddJobForm={openAddJobForm} updateData={updateData} deleteData={deleteData}/>}
             {!!viewingJobs && <JobsList/>}
           </>

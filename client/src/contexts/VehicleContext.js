@@ -65,6 +65,7 @@ const queries = {
         cost
         servicesPerformed {
           name
+          id
         }
         dateCompleted
         performedBy 

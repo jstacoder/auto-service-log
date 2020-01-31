@@ -2,11 +2,10 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 const { ServiceSchema } = require('./Service')
 const { VehicleSchema } = require('./Vehicle')
+const PerformedService = require('./PerformedService')
 
 const JobSchema = new Schema({
-  servicesPerformed: [
-       String
-  ],
+
   dateCompleted: {
      type: Date,
      default: Date.now(),
@@ -19,12 +18,32 @@ const JobSchema = new Schema({
   },
   cost: String,
   vehicle: VehicleSchema,
-})
+}, {toObject: {virtuals: true}})
 
 JobSchema.virtual('services', {
-  ref: 'Service',
-  localField: 'servicesPerformed',
-  foreignField: 'name',
+  ref: 'PerformedService',
+  localField: '_id',
+  foreignField: 'jobId',
 })
+
+JobSchema.statics.createJob = function({performedBy, timeTaken, cost, vehicle, dateCompleted, services}, callback){
+  const createServicePromise = (service, jobId) => new Promise((resolve, reject)=>{
+    PerformedService.create({jobId, serviceName: service}, (err, ps)=>{
+      if(err){
+        reject(err)
+      }
+      resolve(ps)
+    })
+  })
+  return this.create({performedBy, timeTaken, cost, vehicle, dateCompleted}, (err, job)=>{
+    const servicePromises = services.map(service=>{
+      return createServicePromise(service, job._id)
+    })
+    console.log(servicePromises)
+    Promise.all(servicePromises).then(res=> {
+      job.populate('services',callback)
+    })
+  })
+}
 
 exports = module.exports = mongoose.model('Job', JobSchema )
