@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from "react";
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 import { Col, Card, CardTitle, CardSubtitle, Button } from "reactstrap";
 import SettingsGroup from "./SettingsGroup";
 import VehicleEditForm from "./VehicleEditForm";
