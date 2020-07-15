@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 const morgan  = require('morgan');
 const cors = require('cors');
 const router = require('./routes/router');
-const port = process.env.PORT || 5000;
+const port = 5000;
 
 mongoose.connect(mongoDbUri, {useNewUrlParser: true})
 
