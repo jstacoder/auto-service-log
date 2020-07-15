@@ -66,7 +66,7 @@ const VehicleCard  = props => {
     if (!toggleEdit) {
       return (
         <Fragment>
-          <Col className="mt-2 mb-4" md="6">
+          <Col className="mt-2 mb-4" xs={12}>
             <Card body id={_id}>
               <CardTitle className="lead">{make}</CardTitle>
               <CardSubtitle className="text-muted">

@@ -9,7 +9,6 @@ services:
         command: "yarn start"
         working_dir: /app
         environment:
-            - MONGODB_URI=$MONGODB_URI
             - PORT=$PORT
         ports:
             - "5005:5005"

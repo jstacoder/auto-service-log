@@ -105,7 +105,7 @@ const getServices = () => {
             return {
               ...result,
               id: result._id,
-              name: result.name,
+              serviceName: result.name,
               difficulty: result.difficulty,
               suggestedServiceInterval: result.suggestedServiceInterval,
               estimatedTimeToComplete: result.estimatedTimeToComplete,

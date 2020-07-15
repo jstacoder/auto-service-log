@@ -4,6 +4,7 @@ import {
   Button,
   Container,
   Row,
+  Col,
 } from 'reactstrap'
 import { JobsList } from '../components/jobs/JobList'
 import { OdometerLog } from '../components/OdometerLog'

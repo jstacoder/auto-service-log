@@ -196,14 +196,14 @@ export const AddJob = ({toggle, activeVehicle}) =>{
               <label htmlFor='service'>Services performed</label>
              <hr/>
              {services.map(service=>
-                 <FormGroup check key={service.name}>
+                 <FormGroup check key={service.serviceName}>
                    <Label check>
                      <Input
                          type={'checkbox'}
                          checked={selectedServices.indexOf(service)>=0}
                          onChange={()=> change(service)}
                      />
-                     {service.name}
+                     {service.serviceName}
                    </Label>
                  </FormGroup>
              )}
