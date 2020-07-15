@@ -27,8 +27,8 @@
   },
   "scripts": {
     "start": "yarn install && react-scripts start",
-    "start:production": "serve -l $PORT -s build",
-    "build": "react-scripts build",
+    "start:production": "yarn install && serve -l $PORT -s build",
+    "build": "yarn install && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
