@@ -12,14 +12,10 @@ const VehicleCard  = props => {
   //Toggle state to conditional rendering
   const [toggleEdit, setToggleEdit] = useState(false)
 
-  const addJob = () =>{
-    props.openAddJobForm(props)
-  }
+  const addJob = () => props.openAddJobForm(props)
 
-  const handleEditClick = () => {
-    //show edit form when clicking initial edit button
-    setToggleEdit(true)
-  }
+  //show edit form when clicking initial edit button
+  const handleEditClick = () => setToggleEdit(true)
 
   const handleEditSubmit = editedValues => {
     // assign to edited field coming from VehicleEditForm the id of the student
@@ -30,16 +26,10 @@ const VehicleCard  = props => {
     setToggleEdit(false)
   }
 
-  const handleCancelSubmit = () => {
-    //change state to render student card
-    setToggleEdit(false)
-  }
+  //change state to render student card
+  const handleCancelSubmit = () => setToggleEdit(false)
 
-  const handleDeleteClick = () => {
-    //call deleteData function on app with vehicleId
-    const vehicleId = props.id
-    props.deleteData(vehicleId)
-  }
+  const handleDeleteClick = () => props.deleteData(props)
 
   const handleDetailClick = () => {
     //deconstruct props

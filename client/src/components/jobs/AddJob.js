@@ -1,6 +1,12 @@
 import React, { useState, useReducer } from 'react'
 import { Button, Input, Label, FormGroup, Row, Col } from 'reactstrap'
+import {
+  Link,
+  useHistory,
+  useParams
+} from 'react-router-dom'
 import { useServiceContext } from '../../contexts/ServiceContext'
+import { useVehicleContext } from '../../contexts/VehicleContext'
 import { makeRequest } from '../../helpers/graphql'
 
 const initialState = {
@@ -65,10 +71,14 @@ const useTimeTaken = () => {
   }
 }
 
-export const AddJob = ({toggle, activeVehicle}) =>{
+export const AddJob = () =>{
   const { services } = useServiceContext()
   const [selectedServices, setSelectedServices] = useState([])
   const [performedBy, setPerformedBy] = useState('')
+  const history = useHistory()
+  const { vehicleId } = useParams()
+  const { getVehicleById } = useVehicleContext()
+  const activeVehicle = getVehicleById(vehicleId) || null
 
   const setDiy = () => setPerformedBy('diy')
   const [diy, setdiy] = useState(false)
@@ -114,15 +124,11 @@ export const AddJob = ({toggle, activeVehicle}) =>{
         _id: activeVehicle._id
       },
     }
-
-    console.log('saveing, ', job)
-
     const result = await makeRequest(query, {job})
-    console.log('saved', result)
 
     if(result.createJob.ok){
       resetForm()
-      toggle()
+      history.pop()
     }
 
   }
@@ -147,10 +153,10 @@ export const AddJob = ({toggle, activeVehicle}) =>{
     })
   }
 
-  return (
+  return activeVehicle && (
        <form>
           <h1>Job Dashboard</h1>
-          <h3>Add New Job for your {activeVehicle.model.year} {activeVehicle.make} {activeVehicle.model.name}</h3>
+          <h3>Add New Job for your {activeVehicle.model.year} {activeVehicle.make.name} {activeVehicle.model.name}</h3>
           <hr/>
           <legend><p>add job</p></legend>
          <Row>
@@ -215,7 +221,7 @@ export const AddJob = ({toggle, activeVehicle}) =>{
            </Col>
            <Col xs={3}/>
            <Col xs={2}>
-             <Button color={'danger'} onClick={toggle} type={'danger'}>cancel</Button>
+             <Button color={'danger'} tag={Link} to={'/dashboard'} type={'danger'}>cancel</Button>
            </Col>
          </Row>
        </form>

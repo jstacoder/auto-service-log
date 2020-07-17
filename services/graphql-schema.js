@@ -169,9 +169,14 @@ const getOdometerHistory = (obj, args) => {
   })
 }
 
-const createVehicle = (obj, {input: {make, model, year}}, context, info) => {
-  const vehicle = new Vehicle({make: make.name, model: model.name, year})
-  return vehicle.save().then(vehicle => ({ ok: true, vehicle: { make, model, year} }))
+const deleteVehicle = (obj, {vehicleId}, context, info) =>{
+  const vehicle = Vehicle.find({_id: vehicleId})
+  return vehicle.remove()
+}
+
+const createVehicle = (obj, {input: {make, model, miles}}, context, info) => {
+  const vehicle = new Vehicle({make: make, model: model, currentOdometerReading: miles})
+  return vehicle.save().then(vehicle => ({ ok: true, vehicle: { make, model, currentOdometerReading: miles} }))
 }
 const createService = (obj, {input}, context, info)=> {
   const service = new Service({
@@ -231,6 +236,7 @@ const resolvers = {
     createService,
     createJob,
     createOdometerReading,
+    deleteVehicle,
   },
   Make: {
     models(obj, args, context, info) {

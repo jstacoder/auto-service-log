@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { find } from 'mout/array'
 
 import { makeRequest } from '../helpers/graphql'
 
@@ -77,6 +78,15 @@ const queries = {
       }
     }
     
+  `,
+  // language=GraphQL
+  deleteVehicle: `
+    mutation deleteVehicle($vehicleID: ID!){
+      deleteVehicle(vehicleId: $vehicleID){
+        errors
+        ok
+      }
+    }
   `
 }
 
@@ -91,6 +101,7 @@ export const VehicleContext = createContext({
   removeVehicle: vehicle => {},
   addOdometerReading: (vehicle, miles) => {},
   odometerReadings: [],
+  getVehicleById: vehicleId=> {},
 })
 
 export const VehicleContextProvider = ({children}) => {
@@ -103,6 +114,8 @@ export const VehicleContextProvider = ({children}) => {
 
 
   const getActiveVehicle = () => activeVehicle
+
+  const getVehicleById = vehicleId => find(vehicleList, {_id: vehicleId})
 
   const getOdometerReadings = async vehicle => {
     const { getOdometerHistory:  { readings } } = await makeRequest(queries.getOdometerReadings, {vehicle})
@@ -170,7 +183,8 @@ export const VehicleContextProvider = ({children}) => {
     await makeRequest(queries.createVehicle, {vehicle})
     setVehicles(vehicles => [...vehicles, {...vehicle}])
   }
-  const removeVehicle = vehicle => {
+  const removeVehicle = async vehicle => {
+    await makeRequest(queries.deleteVehicle, {vehicleID: vehicle._id})
     setVehicles(vehicles=> vehicles.filter(current=> current._id !== vehicle._id))
   }
   const updateVehicle = editedVehicle =>{
@@ -189,6 +203,7 @@ export const VehicleContextProvider = ({children}) => {
     activeVehicle,
     addOdometerReading,
     activeVehicleJobs,
+    getVehicleById,
   }
 
   return (
