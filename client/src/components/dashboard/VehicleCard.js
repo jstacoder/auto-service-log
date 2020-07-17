@@ -1,23 +1,21 @@
 import React, { Fragment, useState } from "react";
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 import { Col, Card, CardTitle, CardSubtitle, Button } from "reactstrap";
 import SettingsGroup from "./SettingsGroup";
 import VehicleEditForm from "./VehicleEditForm";
+import { useVehicleContext } from '../../contexts/VehicleContext'
 
 const VehicleCard  = props => {
+  const { setActiveVehicle } = useVehicleContext()
   const history = useHistory()
 
   //Toggle state to conditional rendering
   const [toggleEdit, setToggleEdit] = useState(false)
 
-  const addJob = () =>{
-    props.openAddJobForm(props)
-  }
+  const addJob = () => props.openAddJobForm(props)
 
-  const handleEditClick = () => {
-    //show edit form when clicking initial edit button
-    setToggleEdit(true)
-  }
+  //show edit form when clicking initial edit button
+  const handleEditClick = () => setToggleEdit(true)
 
   const handleEditSubmit = editedValues => {
     // assign to edited field coming from VehicleEditForm the id of the student
@@ -28,16 +26,10 @@ const VehicleCard  = props => {
     setToggleEdit(false)
   }
 
-  const handleCancelSubmit = () => {
-    //change state to render student card
-    setToggleEdit(false)
-  }
+  //change state to render student card
+  const handleCancelSubmit = () => setToggleEdit(false)
 
-  const handleDeleteClick = () => {
-    //call deleteData function on app with vehicleId
-    const vehicleId = props.id
-    props.deleteData(vehicleId)
-  }
+  const handleDeleteClick = () => props.deleteData(props)
 
   const handleDetailClick = () => {
     //deconstruct props
@@ -50,6 +42,10 @@ const VehicleCard  = props => {
       state: { id: _id, make, model: model.name, year: model.year }
     })
   }
+  const setViewingJobs = () =>{
+    setActiveVehicle(props)
+    props.setViewingJobs(true)
+  }
 
   // this renderContent function written outside render method to use if statement
   const renderContent = () => {
@@ -60,7 +56,7 @@ const VehicleCard  = props => {
     if (!toggleEdit) {
       return (
         <Fragment>
-          <Col className="mt-2 mb-4" md="6">
+          <Col className="mt-2 mb-4" xs={12}>
             <Card body id={_id}>
               <CardTitle className="lead">{make}</CardTitle>
               <CardSubtitle className="text-muted">
@@ -80,6 +76,7 @@ const VehicleCard  = props => {
                   <Button
                     color='info'
                     className='mr-2'
+                    onClick={()=> setViewingJobs()}
                   >
                     view jobs
                   </Button>

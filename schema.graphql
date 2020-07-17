@@ -17,10 +17,11 @@ interface IService {
   difficulty: Difficulty
   "how long it should take"
   estimatedTimeToComplete: EstimatedTimeToCompleteType
-  "the name of the service"
-  name: String!
+  id: ID!
   "materials etc..."
   notes: String
+  "the name of the service"
+  serviceName: String!
   "when should we be reminded to do it again"
   suggestedServiceInterval: ServiceIntervalType
 }
@@ -35,6 +36,11 @@ interface ShortInterval {
   days: Day
   hours: Hour
   minutes: Minute
+}
+
+type DeleteVehicleResult {
+  errors: [String]
+  ok: Boolean
 }
 
 type EstimatedTimeToCompleteType implements ShortInterval {
@@ -57,11 +63,9 @@ type Job {
   "who performed the service: ie: diy"
   performedBy: String!
   "list of services performed"
-  servicesPerformed: [Service!]!
+  services: [Service!]!
   "how long did it take"
   timeTaken: EstimatedTimeToCompleteType
-#  "the vehicle the service was performed on"
-#  vehicle: Vehicle
 }
 
 type JobResult implements IResult {
@@ -94,6 +98,8 @@ type Mutation {
   createService(input: ServiceInput!): ServiceResult!
   "add a vehicle to the db"
   createVehicle(input: CreateVehicleInput!): VehicleResult!
+  "remove a vehicle from the db"
+  deleteVehicle(vehicleId: ID!): DeleteVehicleResult!
 }
 
 type OdometerResult {
@@ -135,8 +141,9 @@ type Query {
 type Service implements IService {
   difficulty: Difficulty
   estimatedTimeToComplete: EstimatedTimeToCompleteType
-  name: String!
+  id: ID!
   notes: String
+  serviceName: String!
   suggestedServiceInterval: ServiceIntervalType
 }
 
@@ -185,19 +192,19 @@ type VehicleResult implements IResult {
 }
 
 enum Difficulty {
-  #super easy (should do myself)
+  "super easy (should do myself)"
   EASY
-  #pretty tough, should think about letting a mechanic handle it
+  "pretty tough, should think about letting a mechanic handle it"
   HARD
-  #tools or experience needed hard to get, let a pro do these
+  "tools or experience needed hard to get, let a pro do these"
   IMPOSSIBLE
-  #a litter harder, should still diy, but research more thouroughly first
+  "a litter harder, should still diy, but research more thouroughly first"
   INTERMEDIATE
 }
 
 input CreateVehicleInput {
   make: MakeInput!
-  miles: String
+  miles: Int
   model: ModelInput!
 }
 
@@ -219,8 +226,8 @@ input GetModelsInput {
 input JobInput {
   cost: String
   performedBy: String!
-  servicesPerformed: [FindServiceInput!]
-  timeTaken: String
+  services: [String!]
+  timeTaken: TimeTakenInput!
   vehicle: VehicleInput!
 }
 
@@ -230,6 +237,7 @@ input MakeInput {
 
 input ModelInput {
   name: String!
+  year: Int!
 }
 
 input OdometerInput {
@@ -255,28 +263,34 @@ input ServiceIntervalInput {
   years: Year
 }
 
+input TimeTakenInput {
+  days: Day
+  hours: Hour
+  minutes: Minute
+}
+
 input VehicleInput {
   _id: ID!
 }
 
 
-"a 4 digit year"
-scalar Year
-
-"a number of minutes ie: 9 = nine minutes"
-scalar Minute
-
-"a number of hours ie: 3 = three hours"
-scalar Hour
+"a date in the form of YYYY-MM-DD"
+scalar Date
 
 "a number of days ie: 6 = six days"
 scalar Day
 
+"a number of hours ie: 3 = three hours"
+scalar Hour
+
+"a number of minutes ie: 9 = nine minutes"
+scalar Minute
+
 "a number of months ie: 4 = four months"
 scalar Month
 
-"a date in the form of YYYY-MM-DD"
-scalar Date
+"a 4 digit year"
+scalar Year
 
 scalar DateTime
 

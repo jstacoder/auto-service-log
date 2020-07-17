@@ -10,9 +10,15 @@ const mongoose = require('mongoose');
 const morgan  = require('morgan');
 const cors = require('cors');
 const router = require('./routes/router');
-const port = process.env.PORT || 5000;
+const port = 5000;
 
 mongoose.connect(mongoDbUri, {useNewUrlParser: true})
+
+process.on('SIGINT', ()=>{
+  mongoose.connection.close(()=> {
+    process.exit(0)
+  })
+})
 
 app.use(morgan('combined'));
 app.use(cors());

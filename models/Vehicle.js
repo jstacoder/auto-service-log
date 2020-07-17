@@ -7,9 +7,8 @@ const VehicleSchema = new Schema({
   },
   model: {
     name: String,
-    year: String
+    year: Number,
   },
-  year: Number,
   currentOdometerReading: Number,
 })
 

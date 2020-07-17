@@ -142,7 +142,7 @@ export const Services = () => {
                       <Col style={{marginTop: '10px'}} md={4}>
                         <Card>
                           <CardHeader tag={'h4'}>
-                            {service.name}
+                            {service.serviceName}
                           </CardHeader>
                         <CardBody>
                           <dl>

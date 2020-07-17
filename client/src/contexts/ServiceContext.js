@@ -3,10 +3,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import { makeRequest } from '../helpers/graphql'
 
 const queries = {
+  // language=GraphQL
   getServices: `
     {
       services: getServices{
-        name
+        id
+        serviceName
         difficulty
         estimatedTimeToComplete {
           minutes
@@ -22,6 +24,7 @@ const queries = {
       }
     }
   `,
+  // language=GraphQL
   createService: `
     mutation addService($service: ServiceInput!){
       createService(input: $service){
@@ -77,7 +80,7 @@ export const ServiceContextProvider = ({children}) => {
     services: serviceList,
     addService,
     removeService,
-  }
+              }
 
   return (
       <ServiceContext.Provider value={value}>

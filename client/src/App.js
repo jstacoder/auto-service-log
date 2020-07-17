@@ -5,13 +5,13 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCogs } from '@fortawesome/free-solid-svg-icons';
 
 import React, { Component } from "react";
-import { Route, Switch } from 'react-router'
-import { BrowserRouter as Router } from "react-router-dom";
-import { createBrowserHistory } from 'history'
+import { Route, Switch } from "react-router-dom";
+import Container from 'reactstrap/lib/Container'
+import AddVehicle from './components/dashboard/AddVehicle'
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
+import Dashboard, { AddJobPage } from './pages/Dashboard'
 import Error from './components/Error';
 import VehicleDetails from "./pages/VehicleDetails";
 import SignUp from './components/authentication/SignUp';
@@ -28,12 +28,12 @@ class App extends Component {
   render() {
     return (
           <div>
-                <Router history={createBrowserHistory()}>
             <ToggleContextProvider>
             <VehicleContextProvider>
               <ServiceContextProvider>
                 <div style={{display: 'flex', flexDirection: 'column'}}>
                 <Header />
+                <Container>
                 <Switch>
                   <Route exact path="/" component={Home} />
                   <Route path="/signup" render={()=> <SignUp />} />
@@ -42,14 +42,16 @@ class App extends Component {
                   <Route path="/dashboard" component={Dashboard} />
                   <Route path="/vehicle-details" component={VehicleDetails} />
                   <Route path="/services" component={Services}/>
+                  <Route path="/add-vehicle" component={AddVehicle}/>
+                  <Route path="/add-vehicle-job/:vehicleId" component={AddJobPage}/>
                   <Route component={Error} />
                 </Switch>
+                </Container>
                 <Footer />
                 </div>
               </ServiceContextProvider>
             </VehicleContextProvider>
             </ToggleContextProvider>
-                </Router>
           </div>
     );
   }
