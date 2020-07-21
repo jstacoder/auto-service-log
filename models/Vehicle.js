@@ -1,4 +1,6 @@
 const mongoose = require("mongoose")
+const { OdometerReadingSchema } = require("./OdometerReading")
+
 const Schema = mongoose.Schema
 
 const VehicleSchema = new Schema({
@@ -10,6 +12,9 @@ const VehicleSchema = new Schema({
     year: Number,
   },
   currentOdometerReading: Number,
+  odometerReadings: [
+      OdometerReadingSchema
+  ]
 })
 
 exports = module.exports = mongoose.model('Vehicle', VehicleSchema )

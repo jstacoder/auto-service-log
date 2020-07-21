@@ -9,7 +9,7 @@ const _ = require('lodash')
 const Vehicle = require('../models/Vehicle')
 const Service = require('../models/Service')
 const Job = require('../models/Job')
-const OdometerReading = require('../models/OdometerReading')
+const { OdometerReading } = require('../models/OdometerReading')
 const async = require('async')
 
 const getMakes = module.exports.getMakes = async (obj, args, context, info) => {
